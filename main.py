@@ -1,5 +1,17 @@
 from math import pi, sin, cos
 
+from panda3d.core import loadPrcFileData
+
+confVars = """
+win-size 1280 720
+window-title Orbital Dynamics
+show-frame-rate-meter 1
+show-scene-graph-analyzer-meter 1
+sync-video 1
+"""
+
+loadPrcFileData("", confVars)
+
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 
@@ -27,7 +39,7 @@ class MyApp(ShowBase):
 		angleDegrees = task.time * 6.0
 		angleRadians = angleDegrees * (pi / 180.0)
 		self.camera.setPos(20 * sin(angleRadians), -20 * cos(angleRadians), 3)
-		self.camera.setHpr(angleDegrees, 0, 0)
+		self.camera.setHpr(angleDegrees, 20 * sin(5 * angleRadians), 0)
 		return Task.cont
 
 
