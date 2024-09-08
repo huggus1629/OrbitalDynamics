@@ -20,14 +20,14 @@ class MyApp(ShowBase):
 	def __init__(self):
 		ShowBase.__init__(self)
 
-		self.skybox_texture = self.loader.loadCubeMap('skybox/cubemap_#.png')
-		self.skybox = self.loader.loadModel('models/box')
-		self.skybox.setScale(2)
+		#self.skybox_texture = self.loader.loadCubeMap('skybox/cubemap_#.png')
+		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
+		self.skybox.setScale(2000)
 		self.skybox.reparentTo(self.render)
-		self.skybox.setTexture(self.skybox_texture, 1)
-		# self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
+		#self.skybox.setTexture(self.skybox_texture, 1)
+		# self.taskMgr.add(self.spinCameraTask, "SpinCameraTask") (NOT USED, EXAMPLE ONLY)
 
-	# Define a procedure to move the camera.
+	# Define a procedure to move the camera. (NOT USED, EXAMPLE ONLY)
 	def spinCameraTask(self, task):
 		angleDegrees = task.time * 24.0
 		angleRadians = angleDegrees * (pi / 180.0)
