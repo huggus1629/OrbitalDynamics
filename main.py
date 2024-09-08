@@ -1,9 +1,20 @@
 from math import pi, sin, cos
+import platform
+
+running_windows = False
+w, h = 1280, 720
+if platform.system() == "Windows":
+	running_windows = True
+	import ctypes
+
+	user32 = ctypes.windll.user32
+	user32.SetProcessDPIAware()
+	w, h = user32.GetSystemMetrics(0) / 2, user32.GetSystemMetrics(1) / 2
 
 from panda3d.core import loadPrcFileData
 
-confVars = """
-win-size 1280 720
+confVars = f"""
+win-size {w} {h}
 window-title Orbital Dynamics
 show-frame-rate-meter 1
 show-scene-graph-analyzer-meter 1
