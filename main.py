@@ -1,6 +1,7 @@
 from math import pi, sin, cos
 
-from panda3d.core import loadPrcFileData, WindowProperties
+from direct.gui.OnscreenText import OnscreenText
+from panda3d.core import loadPrcFileData, WindowProperties, TextNode
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 
@@ -15,7 +16,7 @@ if platform.system() == "Windows":
 	user32 = ctypes.windll.user32
 	user32.SetProcessDPIAware()
 	w, h = int(user32.GetSystemMetrics(0) / 2), int(user32.GetSystemMetrics(1) / 2)
-
+w_mid, h_mid = w // 2, h // 2
 
 confVars = f"""
 win-size {w} {h}
@@ -35,55 +36,91 @@ class MyApp(ShowBase):
 		self.skybox.setScale(2000)
 		self.skybox.reparentTo(self.render)
 
-		# Disable default camera control
+		# disable default camera control
 		self.disableMouse()
 
-		# To set confined mode and hide the cursor:
+		# sets confined mode and hides the cursor:
 		props = WindowProperties()
 		props.setCursorHidden(True)
 		props.setMouseMode(WindowProperties.M_confined)
 		self.win.requestProperties(props)
-		# self.taskMgr.doMethodLater(0, self.resolveMouse, "Resolve mouse setting")
 
-		# TODO center mouse ptr
+		self.mouse_centered = False
+		self.win_focused = True
+
+		self.accept("window-event", self.handle_window_event)
+
 		# TODO wasd
 		# TODO quit on esc
 		# TODO menu
 
-		self.prev_mouse_x = 0
-		self.prev_mouse_y = 0
+		self.mouse_dx_text = self.genLabelText(f"Mouse dx = --", 1)
+		self.mouse_dy_text = self.genLabelText(f"Mouse dy = --", 2)
+
+		self.cam_hdg_text = self.genLabelText(f"Camera heading = --°", 4)
+		self.cam_ptc_text = self.genLabelText(f"Camera pitch = --°", 5)
 
 		self.taskMgr.add(self.update_camera, "CameraUpdater")
 
-	# def resolveMouse(self, task):
-	# 	props = self.win.getProperties()
-	#
-	# 	actualMode = props.getMouseMode()
-	# 	if actualMode != WindowProperties.M_relative:
-	# 		print("Could not set relative mouse mode! :(")
+	def genLabelText(self, text, i):
+		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
+		return OnscreenText(text=text, pos=(0.06, -.06 * (i + 0.5)), fg=(1, 1, 1, 1), parent=self.a2dTopLeft,
+																						align=TextNode.ALeft, scale=.05)
+
+	def handle_window_event(self, window):
+		"""Handles when the window gains or loses focus"""
+		if window.getProperties().getForeground():
+			print("Window gained focus")
+			self.win_focused = True
+			self.mouse_centered = False  # center mouse pointer without moving camera
+		else:
+			print("Window lost focus")
+			self.win_focused = False
+
+		# Check if the window is closed
+		if not window.getProperties().getOpen():
+			print("Window closed. Exiting application...")
+			self.userExit()
+
+	def reset_mouse(self):
+		"""Resets mouse pointer position to the middle of the window"""
+		if not self.mouseWatcherNode.hasMouse():
+			return
+		self.win.movePointer(0, w_mid, h_mid)
 
 	def update_camera(self, task):
+		"""Updates camera heading/pitch according to mouse input"""
 		# Check if the mouse is available
-		if self.mouseWatcherNode.hasMouse():
-			mouse_x = self.mouseWatcherNode.getMouseX()
-			mouse_y = self.mouseWatcherNode.getMouseY()
+		if not self.mouseWatcherNode.hasMouse():
+			return Task.cont
 
-			delta_x = mouse_x - self.prev_mouse_x
-			delta_y = mouse_y - self.prev_mouse_y
+		if not self.mouse_centered:  # center mouse pointer without moving camera
+			self.win.movePointer(0, w_mid, h_mid)
+			self.mouse_centered = True
+			return Task.cont
 
-			# Store the current position for the next frame
-			self.prev_mouse_x = mouse_x
-			self.prev_mouse_y = mouse_y
+		mouse_dx = self.mouseWatcherNode.getMouseX()
+		mouse_dy = self.mouseWatcherNode.getMouseY()
 
-			sensitivity = 100  # Adjust this value for sensitivity
+		self.mouse_dx_text.text = f"Mouse dx = {mouse_dx}"
+		self.mouse_dy_text.text = f"Mouse dy = {mouse_dy}"
 
-			# Get the current heading, pitch, and roll
-			hdg, ptc, rll = self.camera.getHpr()
+		sensitivity = 100  # adjust this value for sensitivity
 
-			hdg -= delta_x * sensitivity  # Horizontal mouse movement rotates yaw (heading)
-			ptc += delta_y * sensitivity  # Vertical mouse movement rotates pitch
+		# get current heading, pitch, and roll
+		hdg, ptc, rll = self.camera.getHpr()
 
-			self.camera.setHpr(hdg, ptc, rll)
+		hdg -= mouse_dx * sensitivity  # horizontal mouse movement changes heading
+		ptc += mouse_dy * sensitivity  # vertical mouse movement changes pitch
+
+		ptc = max(-90, min(90, ptc))  # clamps pitch to +-90°
+
+		self.camera.setHpr(hdg, ptc, rll)
+
+		self.cam_hdg_text.text = f"Camera heading = {hdg}°"
+		self.cam_ptc_text.text = f"Camera pitch = {ptc}°"
+
+		self.reset_mouse()  # recenters mouse pointer
 
 		return Task.cont
 
