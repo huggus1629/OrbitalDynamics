@@ -1,4 +1,9 @@
 from math import pi, sin, cos
+
+from panda3d.core import loadPrcFileData, WindowProperties
+from direct.showbase.ShowBase import ShowBase
+from direct.task import Task
+
 import platform
 
 running_windows = False
@@ -11,7 +16,6 @@ if platform.system() == "Windows":
 	user32.SetProcessDPIAware()
 	w, h = int(user32.GetSystemMetrics(0) / 2), int(user32.GetSystemMetrics(1) / 2)
 
-from panda3d.core import loadPrcFileData, WindowProperties
 
 confVars = f"""
 win-size {w} {h}
@@ -21,9 +25,6 @@ sync-video 1
 """
 
 loadPrcFileData("", confVars)
-
-from direct.showbase.ShowBase import ShowBase
-from direct.task import Task
 
 
 class MyApp(ShowBase):
