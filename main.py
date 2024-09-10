@@ -45,7 +45,6 @@ class MyApp(ShowBase):
 		# self.taskMgr.doMethodLater(0, self.resolveMouse, "Resolve mouse setting")
 
 		# TODO center mouse ptr
-		# TODO invert y
 		# TODO wasd
 		# TODO quit on esc
 		# TODO menu
@@ -81,7 +80,7 @@ class MyApp(ShowBase):
 			hdg, ptc, rll = self.camera.getHpr()
 
 			hdg -= delta_x * sensitivity  # Horizontal mouse movement rotates yaw (heading)
-			ptc -= delta_y * sensitivity  # Vertical mouse movement rotates pitch
+			ptc += delta_y * sensitivity  # Vertical mouse movement rotates pitch
 
 			self.camera.setHpr(hdg, ptc, rll)
 
