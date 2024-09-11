@@ -33,6 +33,8 @@ class MyApp(ShowBase):
 		ShowBase.__init__(self)
 		kb = KeyboardButton()
 
+		self.camLens.setFov(90)  # passing only horizontal fov automatically calculates vertical fov
+
 		# set up skybox
 		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
 		self.skybox.setScale(30000)
@@ -84,6 +86,7 @@ class MyApp(ShowBase):
 		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 3)
 		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 4)
 		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 5)
+		self.cam_fov_text = self.genLabelText(f"Cam FOV = {self.camLens.getFov()[0]}", 7)
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
