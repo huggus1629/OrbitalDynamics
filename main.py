@@ -1,7 +1,7 @@
 from math import pi, sin, cos
 
 from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import loadPrcFileData, WindowProperties, TextNode
+from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 
@@ -31,10 +31,18 @@ loadPrcFileData("", confVars)
 class MyApp(ShowBase):
 	def __init__(self):
 		ShowBase.__init__(self)
+		kb = KeyboardButton()
 
 		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
-		self.skybox.setScale(2000)
+		self.skybox.setScale(30000)
+		self.skybox.setShaderOff()
+		self.skybox.setDepthWrite(False)
+		self.skybox.setLightOff()
 		self.skybox.reparentTo(self.render)
+
+		self.testmodel = self.loader.loadModel('models/box')
+		self.testmodel.setScale(10)
+		self.testmodel.reparentTo(self.render)
 
 		# disable default camera control
 		self.disableMouse()
@@ -50,37 +58,74 @@ class MyApp(ShowBase):
 
 		self.accept("window-event", self.handle_window_event)  # detects focus change
 
-		self.accept("w", self.update_camera_xyz, ['w', False])
-		self.accept("a", self.update_camera_xyz, ['a', False])
-		self.accept("s", self.update_camera_xyz, ['s', False])
-		self.accept("d", self.update_camera_xyz, ['d', False])
+		self.isDown = self.mouseWatcherNode.isButtonDown		# "The name of this class is a bit misleading -
+														# it listens for keyboard events as well."
+		self.forward_btn = kb.asciiKey('w')
+		self.left_btn = kb.asciiKey('a')
+		self.backward_btn = kb.asciiKey('s')
+		self.right_btn = kb.asciiKey('d')
+
+		self.up_btn = kb.space()
+		self.down_btn = kb.lcontrol()
+
+		self.boost_btn = kb.lshift()
+		self.cam_spd_boost = False
 
 		# TODO fix misaligned edge on skybox
-		# TODO wasd controls
-		# TODO movement speed modifier
-		# TODO shift to boost
 		# TODO quit on esc
 		# TODO menu
 
-		self.mouse_dx_text = self.genLabelText(f"Mouse dx = --", 1)
-		self.mouse_dy_text = self.genLabelText(f"Mouse dy = --", 2)
+		# self.messenger.toggleVerbose()
 
-		self.cam_hdg_text = self.genLabelText(f"Camera heading = --°", 4)
-		self.cam_ptc_text = self.genLabelText(f"Camera pitch = --°", 5)
+		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 1)
 
-		self.taskMgr.add(self.update_camera_hpr, "CameraUpdater")
+		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 3)
+		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 4)
+
+		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
+		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
 
 	# ================ END INIT ====================
 
-	def update_camera_xyz(self, key, boost: bool):
-		if key == 'w':  # forward
-			pass
-		elif key == 'a':  # left
-			pass
-		elif key == 's':  # backward
-			pass
-		elif key == 'd':  # right
-			pass
+	def camera_speed_mod(self):
+		multiplier = 2
+		if self.isDown(self.boost_btn):
+			return multiplier
+		else:
+			return 1
+
+	def update_camera_xyz(self, task):
+		cam_x, cam_y, cam_z = self.camera.getPos()
+		self.cam_pos_text.text = f"Cam xyz = ({cam_x:.3f}, {cam_y:.3f}, {cam_z:.3f})"
+
+		movement_speed = 1 * self.camera_speed_mod()
+
+		cam_h, cam_p, cam_r = self.camera.getHpr()
+		cam_h *= pi / 180  # conversion to radians
+		cam_p *= pi / 180
+
+		if self.isDown(self.forward_btn):
+			cam_x -= cos(cam_p) * sin(cam_h) * movement_speed
+			cam_y += cos(cam_p) * cos(cam_h) * movement_speed
+			cam_z += sin(cam_p) * movement_speed
+		if self.isDown(self.left_btn):
+			cam_x -= cos(cam_h) * movement_speed
+			cam_y -= sin(cam_h) * movement_speed
+		if self.isDown(self.backward_btn):
+			cam_x += cos(cam_p) * sin(cam_h) * movement_speed
+			cam_y -= cos(cam_p) * cos(cam_h) * movement_speed
+			cam_z -= sin(cam_p) * movement_speed
+		if self.isDown(self.right_btn):
+			cam_x += cos(cam_h) * movement_speed
+			cam_y += sin(cam_h) * movement_speed
+		if self.isDown(self.up_btn):
+			cam_z += movement_speed
+		if self.isDown(self.down_btn):
+			cam_z -= movement_speed
+
+		self.camera.setPos(cam_x, cam_y, cam_z)
+
+		return Task.cont
 
 	def genLabelText(self, text, i):
 		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
@@ -122,9 +167,6 @@ class MyApp(ShowBase):
 		mouse_dx = self.mouseWatcherNode.getMouseX()
 		mouse_dy = self.mouseWatcherNode.getMouseY()
 
-		self.mouse_dx_text.text = f"Mouse dx = {mouse_dx}"
-		self.mouse_dy_text.text = f"Mouse dy = {mouse_dy}"
-
 		sensitivity = 100  # adjust this value for sensitivity
 
 		# get current heading, pitch, and roll
@@ -137,8 +179,8 @@ class MyApp(ShowBase):
 
 		self.camera.setHpr(hdg, ptc, rll)
 
-		self.cam_hdg_text.text = f"Camera heading = {hdg}°"
-		self.cam_ptc_text.text = f"Camera pitch = {ptc}°"
+		self.cam_hdg_text.text = f"Cam heading = {hdg:.3f}°"
+		self.cam_ptc_text.text = f"Cam pitch = {ptc:.3f}°"
 
 		self.reset_mouse()  # recenters mouse pointer
 
