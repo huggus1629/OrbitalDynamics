@@ -90,9 +90,9 @@ class MyApp(ShowBase):
 
 	# ================ END INIT ====================
 
-	def camera_speed_mod(self):
+	def camera_speed_mod(self, multiplier):
 		"""Returns the specified multiplier only when boost button is held down, returns 1 otherwise"""
-		multiplier = 1.5
+
 		if self.isDown(self.boost_btn):
 			return multiplier
 		else:
@@ -104,7 +104,7 @@ class MyApp(ShowBase):
 		cam_x, cam_y, cam_z = self.camera.getPos()
 		self.cam_pos_text.text = f"Cam xyz = ({cam_x:.3f}, {cam_y:.3f}, {cam_z:.3f})"
 
-		movement_speed = 1 * self.camera_speed_mod()
+		movement_speed = 1 * self.camera_speed_mod(1.5)
 
 		cam_h, cam_p, cam_r = self.camera.getHpr()
 		cam_h *= pi / 180  # conversion to radians
