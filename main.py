@@ -48,9 +48,16 @@ class MyApp(ShowBase):
 		self.mouse_centered = False
 		self.win_focused = True
 
-		self.accept("window-event", self.handle_window_event)
+		self.accept("window-event", self.handle_window_event)  # detects focus change
 
-		# TODO wasd
+		self.accept("w", self.update_camera_xyz, ['w', False])
+		self.accept("a", self.update_camera_xyz, ['a', False])
+		self.accept("s", self.update_camera_xyz, ['s', False])
+		self.accept("d", self.update_camera_xyz, ['d', False])
+
+		# TODO wasd controls
+		# TODO movement speed modifier
+		# TODO shift to boost
 		# TODO quit on esc
 		# TODO menu
 
@@ -60,7 +67,19 @@ class MyApp(ShowBase):
 		self.cam_hdg_text = self.genLabelText(f"Camera heading = --°", 4)
 		self.cam_ptc_text = self.genLabelText(f"Camera pitch = --°", 5)
 
-		self.taskMgr.add(self.update_camera, "CameraUpdater")
+		self.taskMgr.add(self.update_camera_hpr, "CameraUpdater")
+
+	# ================ END INIT ====================
+
+	def update_camera_xyz(self, key, boost: bool):
+		if key == 'w':  # forward
+			pass
+		elif key == 'a':  # left
+			pass
+		elif key == 's':  # backward
+			pass
+		elif key == 'd':  # right
+			pass
 
 	def genLabelText(self, text, i):
 		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
@@ -88,7 +107,7 @@ class MyApp(ShowBase):
 			return
 		self.win.movePointer(0, w_mid, h_mid)
 
-	def update_camera(self, task):
+	def update_camera_hpr(self, task):
 		"""Updates camera heading/pitch according to mouse input"""
 		# Check if the mouse is available
 		if not self.mouseWatcherNode.hasMouse():
