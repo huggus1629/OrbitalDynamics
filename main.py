@@ -83,6 +83,7 @@ class MyApp(ShowBase):
 		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 1)
 		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 3)
 		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 4)
+		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 5)
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
@@ -105,6 +106,7 @@ class MyApp(ShowBase):
 		self.cam_pos_text.text = f"Cam xyz = ({cam_x:.3f}, {cam_y:.3f}, {cam_z:.3f})"
 
 		movement_speed = 1 * self.camera_speed_mod(1.5)
+		self.cam_spd_text.text = f"Cam speed = {movement_speed} units/frame"
 
 		cam_h, cam_p, cam_r = self.camera.getHpr()
 		cam_h *= pi / 180  # conversion to radians
