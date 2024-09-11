@@ -55,6 +55,7 @@ class MyApp(ShowBase):
 		self.accept("s", self.update_camera_xyz, ['s', False])
 		self.accept("d", self.update_camera_xyz, ['d', False])
 
+		# TODO fix misaligned edge on skybox
 		# TODO wasd controls
 		# TODO movement speed modifier
 		# TODO shift to boost
@@ -84,7 +85,7 @@ class MyApp(ShowBase):
 	def genLabelText(self, text, i):
 		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
 		return OnscreenText(text=text, pos=(0.06, -.06 * (i + 0.5)), fg=(1, 1, 1, 1), parent=self.a2dTopLeft,
-																						align=TextNode.ALeft, scale=.05)
+																						align=TextNode.ALeft, scale=.04)
 
 	def handle_window_event(self, window):
 		"""Handles when the window gains or loses focus"""
