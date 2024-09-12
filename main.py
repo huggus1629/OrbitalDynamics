@@ -136,7 +136,7 @@ class MyApp(ShowBase):
 
 		self.camera.setPos(cam_x, cam_y, cam_z)  # moves camera to newly calculated position
 
-		return Task.cont
+		return task.cont
 
 	def genLabelText(self, text, i):
 		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
@@ -199,7 +199,7 @@ class MyApp(ShowBase):
 
 		self.reset_mouse()  # recenters mouse pointer
 
-		return Task.cont
+		return task.cont
 
 
 app = MyApp()
