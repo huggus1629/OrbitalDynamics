@@ -79,7 +79,6 @@ class MyApp(ShowBase):
 		self.boost_btn = kb.lshift()
 		# ----- end button definitions -----
 
-		# TODO fix misaligned edge on skybox (UV unwrap in blender)
 		# TODO menu
 
 		# some debug text
