@@ -62,9 +62,11 @@ class MyApp(ShowBase):
 		self.win_focused = True
 
 		self.accept("window-event", self.handle_window_event)  # detects focus change
+		self.accept("escape", self.userExit)
 
-		self.isDown = self.mouseWatcherNode.isButtonDown	# "The name of this class is a bit misleading -
-															# it listens for keyboard events as well."
+		# "The name of this class is a bit misleading -
+		# it listens for keyboard events as well."
+		self.isDown = self.mouseWatcherNode.isButtonDown
 		# ----- button definitions -----
 		self.forward_btn = kb.asciiKey('w')
 		self.left_btn = kb.asciiKey('a')
@@ -78,7 +80,6 @@ class MyApp(ShowBase):
 		# ----- end button definitions -----
 
 		# TODO fix misaligned edge on skybox (UV unwrap in blender)
-		# TODO quit on esc
 		# TODO menu
 
 		# some debug text
@@ -92,8 +93,7 @@ class MyApp(ShowBase):
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
 		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
 
-	# ================ END INIT ====================
-
+	# ================ END INIT ===================
 	def camera_speed_mod(self, multiplier):
 		"""Returns the specified multiplier only when boost button is held down, returns 1 otherwise"""
 
@@ -142,7 +142,7 @@ class MyApp(ShowBase):
 		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
 
 		return OnscreenText(text=text, pos=(0.06, -.06 * (i + 0.5)), fg=(1, 1, 1, 1), parent=self.a2dTopLeft,
-																						align=TextNode.ALeft, scale=.04)
+							align=TextNode.ALeft, scale=.04)
 
 	def handle_window_event(self, window):
 		"""Handles when the window gains or loses focus"""
