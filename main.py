@@ -7,6 +7,8 @@ from direct.task import Task
 
 import platform
 
+from celbody import CelBody
+
 running_windows = False
 w, h = 1280, 720
 if platform.system() == "Windows":
@@ -43,10 +45,8 @@ class MyApp(ShowBase):
 		self.skybox.setLightOff()
 		self.skybox.reparentTo(self.render)
 
-		# test box
-		self.testmodel = self.loader.loadModel('models/box')
-		self.testmodel.setScale(10)
-		self.testmodel.reparentTo(self.render)
+		self.testplanet = CelBody(self, "planet", "models/box")
+		self.testplanet.node.reparentTo(self.render)
 
 		# disable default camera control
 		self.disableMouse()
