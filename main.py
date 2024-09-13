@@ -79,6 +79,14 @@ class MyApp(ShowBase):
 		self.boost_btn = kb.lshift()
 		# ----- end button definitions -----
 
+		# camera speed
+		self.cam_spd = 1
+
+		self.accept("arrow_up", self.camera_change_speed, [True])
+		self.accept("arrow_up-repeat", self.camera_change_speed, [True])
+		self.accept("arrow_down", self.camera_change_speed, [False])
+		self.accept("arrow_down-repeat", self.camera_change_speed, [False])
+
 		# TODO menu
 
 		# some debug text
@@ -93,6 +101,16 @@ class MyApp(ShowBase):
 		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
 
 	# ================ END INIT ===================
+	def camera_change_speed(self, inc):
+		"""
+		Changes the camera's movement speed
+
+		:param inc: ``True`` when increasing, ``False`` when decreasing speed
+		"""
+		inc = 1 if inc else -1  # convert bool to factor
+		self.cam_spd += inc
+		self.cam_spd = max(1, self.cam_spd)  # cam speed can't go below 1
+
 	def camera_speed_mod(self, multiplier):
 		"""Returns the specified multiplier only when boost button is held down, returns 1 otherwise"""
 
@@ -107,31 +125,31 @@ class MyApp(ShowBase):
 		cam_x, cam_y, cam_z = self.camera.getPos()
 		self.cam_pos_text.text = f"Cam xyz = ({cam_x:.3f}, {cam_y:.3f}, {cam_z:.3f})"
 
-		movement_speed = 1 * self.camera_speed_mod(1.5)
-		self.cam_spd_text.text = f"Cam speed = {movement_speed} units/frame"
+		self.cam_spd *= self.camera_speed_mod(1.5)
+		self.cam_spd_text.text = f"Cam speed = {self.cam_spd} units/frame"
 
 		cam_h, cam_p, cam_r = self.camera.getHpr()
 		cam_h *= pi / 180  # conversion to radians
 		cam_p *= pi / 180
 
 		if self.isDown(self.forward_btn):
-			cam_x -= cos(cam_p) * sin(cam_h) * movement_speed
-			cam_y += cos(cam_p) * cos(cam_h) * movement_speed
-			cam_z += sin(cam_p) * movement_speed
+			cam_x -= cos(cam_p) * sin(cam_h) * self.cam_spd
+			cam_y += cos(cam_p) * cos(cam_h) * self.cam_spd
+			cam_z += sin(cam_p) * self.cam_spd
 		if self.isDown(self.left_btn):
-			cam_x -= cos(cam_h) * movement_speed
-			cam_y -= sin(cam_h) * movement_speed
+			cam_x -= cos(cam_h) * self.cam_spd
+			cam_y -= sin(cam_h) * self.cam_spd
 		if self.isDown(self.backward_btn):
-			cam_x += cos(cam_p) * sin(cam_h) * movement_speed
-			cam_y -= cos(cam_p) * cos(cam_h) * movement_speed
-			cam_z -= sin(cam_p) * movement_speed
+			cam_x += cos(cam_p) * sin(cam_h) * self.cam_spd
+			cam_y -= cos(cam_p) * cos(cam_h) * self.cam_spd
+			cam_z -= sin(cam_p) * self.cam_spd
 		if self.isDown(self.right_btn):
-			cam_x += cos(cam_h) * movement_speed
-			cam_y += sin(cam_h) * movement_speed
+			cam_x += cos(cam_h) * self.cam_spd
+			cam_y += sin(cam_h) * self.cam_spd
 		if self.isDown(self.up_btn):
-			cam_z += movement_speed
+			cam_z += self.cam_spd
 		if self.isDown(self.down_btn):
-			cam_z -= movement_speed
+			cam_z -= self.cam_spd
 
 		self.camera.setPos(cam_x, cam_y, cam_z)  # moves camera to newly calculated position
 
