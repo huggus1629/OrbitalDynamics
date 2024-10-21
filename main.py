@@ -8,6 +8,7 @@ from direct.task import Task
 import platform
 
 from celbody import CelBody
+from tools import digits_after_decimal
 
 running_windows = False
 w, h = 1280, 720
@@ -80,8 +81,8 @@ class MyApp(ShowBase):
 		# ----- end button definitions -----
 
 		# camera speed
-		self.cam_base_spd = 1
-		self.cam_spd_increment = 0.1
+		self.cam_spd_increment = 0.01
+		self.cam_base_spd = round(float(1), digits_after_decimal(self.cam_spd_increment))
 
 		self.accept("arrow_up", self.camera_change_speed, [True])
 		self.accept("arrow_up-repeat", self.camera_change_speed, [True])
@@ -110,7 +111,9 @@ class MyApp(ShowBase):
 		"""
 		inc = 1 if inc else -1  # convert bool to factor
 		self.cam_base_spd += inc * self.cam_spd_increment
-		self.cam_base_spd = max(0 + self.cam_spd_increment, self.cam_base_spd)  # cam speed can't go below 1
+		# cam speed can't go below min increment
+		rnd_digits = digits_after_decimal(self.cam_spd_increment)
+		self.cam_base_spd = round(max(0 + self.cam_spd_increment, self.cam_base_spd), rnd_digits)
 
 	def camera_speed_mod(self, multiplier):
 		"""Returns the specified multiplier only when boost button is held down, returns 1 otherwise"""
