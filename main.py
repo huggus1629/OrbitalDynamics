@@ -46,7 +46,7 @@ class MyApp(ShowBase):
 		self.skybox.setLightOff()
 		self.skybox.reparentTo(self.render)
 
-		self.testplanet = CelBody(self, "planet", "models/box")
+		self.testplanet = CelBody(self, "planet", "./custom_models/sphere.gltf")
 		self.testplanet.node.reparentTo(self.render)
 
 		# disable default camera control
