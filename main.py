@@ -37,10 +37,11 @@ class MyApp(ShowBase):
 		kb = KeyboardButton()
 
 		self.camLens.setFov(90)  # passing only horizontal fov automatically calculates vertical fov
+		self.camLens.set_far(165000)  # enough to look across skybox
 
 		# set up skybox
 		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
-		self.skybox.setScale(30000)
+		self.skybox.setScale(47304)
 		self.skybox.setShaderOff()
 		self.skybox.setDepthWrite(False)
 		self.skybox.setLightOff()
