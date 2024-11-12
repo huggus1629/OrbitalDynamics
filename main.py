@@ -95,17 +95,24 @@ class MyApp(ShowBase):
 		# TODO menu
 
 		# some debug text
-		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 1)
-		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 3)
-		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 4)
-		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 5)
-		self.cam_fov_text = self.genLabelText(f"Cam FOV = {self.camLens.getFov()[0]}", 7)
+		self.realtime_elapsed_text = self.genLabelText(f"Realtime elapsed = -- s", 1)
+		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 3)
+		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 5)
+		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 6)
+		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 7)
+		self.cam_fov_text = self.genLabelText(f"Cam FOV = {self.camLens.getFov()[0]}", 9)
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
 		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
+		self.taskMgr.add(self.update_time_counter, "TimeCounterUpdater")
 
 	# ================ END INIT ===================
+	def update_time_counter(self, task):
+		self.realtime_elapsed_text.text = f"Realtime elapsed = {round(self.clock.getRealTime(), 3)} s"
+
+		return task.cont
+
 	def camera_change_speed(self, inc):
 		"""
 		Changes the camera's movement speed
