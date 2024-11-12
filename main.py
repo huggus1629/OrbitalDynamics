@@ -47,6 +47,8 @@ class MyApp(ShowBase):
 		self.skybox.setLightOff()
 		self.skybox.reparentTo(self.render)
 
+		self.axis = self.loader.loadModel('models/zup-axis')
+		self.axis.reparentTo(self.render)
 		self.testplanet = CelBody(self, "planet", "./custom_models/sphere.gltf")
 		self.testplanet.node.reparentTo(self.render)
 
