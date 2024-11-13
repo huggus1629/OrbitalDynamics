@@ -128,7 +128,19 @@ class MyApp(ShowBase):
 		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
 		self.taskMgr.add(self.update_time_counter, "TimeCounterUpdater")
 
+		self.taskMgr.add(self.calc_forces, "ForceUpdater")
+
 	# ================ END INIT ===================
+	def calc_forces(self, task):
+		# for each pair of celbodies, calculate force
+		for pair in self.celbody_pairs:
+			force = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 2)
+			print(f"({force} = {constants.G} * {pair[0].mass} * {pair[1].mass} / ({pair[0].distance(pair[1])} ** 2))")
+			pair[0].frame_force = force
+			pair[1].frame_force = force
+
+		return task.cont
+
 	def update_time_counter(self, task):
 		self.realtime_elapsed_text.text = f"Realtime elapsed = {round(self.clock.getRealTime(), 3)} s"
 
