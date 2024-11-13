@@ -2,6 +2,8 @@ from direct.showbase.Loader import Loader
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import NodePath, ModelNode
 
+import math
+
 
 class CelBody:
 	def __init__(self, base, name, model_path, mass, vec3_velocity):
@@ -19,3 +21,10 @@ class CelBody:
 		self.vec3_velocity = vec3_velocity
 
 		self.frame_force = 0
+
+	# returns distance (center to center) to other celbody
+	def distance(self, celbody):
+		x1, y1, z1 = self.node.getPos()
+		x2, y2, z2 = celbody.node.getPos()
+		return math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)
+		#return self.node.getDistance(celbody.node)
