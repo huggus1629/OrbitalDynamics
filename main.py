@@ -37,11 +37,11 @@ class MyApp(ShowBase):
 		kb = KeyboardButton()
 
 		self.camLens.setFov(90)  # passing only horizontal fov automatically calculates vertical fov
-		self.camLens.set_far(165000)  # enough to look across skybox
+		self.camLens.set_far(330000)  # enough to look across skybox
 
 		# set up skybox
 		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
-		self.skybox.setScale(47304)
+		self.skybox.setScale(94607)
 		self.skybox.setShaderOff()
 		self.skybox.setDepthWrite(False)
 		self.skybox.setLightOff()
@@ -84,7 +84,7 @@ class MyApp(ShowBase):
 		# ----- end button definitions -----
 
 		# camera speed
-		self.cam_spd_increment = 0.01
+		self.cam_spd_increment = 10
 		self.cam_base_spd = round(float(1), digits_after_decimal(self.cam_spd_increment))
 
 		self.accept("arrow_up", self.camera_change_speed, [True])
