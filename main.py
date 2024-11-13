@@ -6,6 +6,8 @@ from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 
 import platform
+import itertools as it
+from scipy import constants
 
 from celbody import CelBody
 from tools import digits_after_decimal
@@ -48,9 +50,28 @@ class MyApp(ShowBase):
 		self.skybox.reparentTo(self.render)
 
 		self.axis = self.loader.loadModel('models/zup-axis')
+		self.axis.setScale(10)
 		self.axis.reparentTo(self.render)
-		self.testplanet = CelBody(self, "planet", "./custom_models/sphere.gltf")
-		self.testplanet.node.reparentTo(self.render)
+
+		# ----------------- celestial bodies conf -----------------
+		self.celbodies = []
+
+		self.testearth = CelBody(self, "planet", "./custom_models/sphere.gltf", 0, 0)
+		self.testearth.node.setScale(60)
+		self.testearth.node.reparentTo(self.render)
+		self.testearth.mass = 6 * 10**24
+		self.celbodies.append(self.testearth)
+
+		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 0, 0)
+		self.testmoon.node.setScale(20)
+		self.testmoon.node.setPos(100, 0, 0)
+		self.testmoon.node.reparentTo(self.render)
+		self.testmoon.mass = 7 * 10**22
+		self.celbodies.append(self.testmoon)
+
+		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
+		# ----------------- end celestial bodies conf -----------------
+		print(self.celbodies[0].distance(self.celbodies[1]))
 
 		# disable default camera control
 		self.disableMouse()
