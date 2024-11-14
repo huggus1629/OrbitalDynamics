@@ -61,11 +61,17 @@ class MyApp(ShowBase):
 		self.testearth.node.reparentTo(self.render)
 		self.celbodies.append(self.testearth)
 
-		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 7 * 10**22, (0, 0, 0))
+		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 7 * 10**23, (0, 11500000000, 0))
 		self.testmoon.node.setScale(20)
-		self.testmoon.node.setPos(100, 0, 0)
+		self.testmoon.node.setPos(250, 0, 0)
 		self.testmoon.node.reparentTo(self.render)
 		self.celbodies.append(self.testmoon)
+
+		# self.testmoon = CelBody(self, "moon2", "./custom_models/sphere.gltf", 7 * 10 ** 20, (0, 1150000000, 0))
+		# self.testmoon.node.setScale(5)
+		# self.testmoon.node.setPos(250, 100, 0)
+		# self.testmoon.node.reparentTo(self.render)
+		# self.celbodies.append(self.testmoon)
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
 		# ----------------- end celestial bodies conf -----------------
@@ -137,7 +143,6 @@ class MyApp(ShowBase):
 			magnitude = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 3)
 			vec3_r = pair[0].vec3_r(pair[1])
 			vec3_force = vec_mul(vec3_r, magnitude)
-			# print(f"({magnitude} = {constants.G} * {pair[0].mass} * {pair[1].mass} / ({pair[0].distance(pair[1])} ** 2))")
 			pair[0].l_vec3_f_forces.append(vec3_force)
 			pair[1].l_vec3_f_forces.append(vec_neg(vec3_force))
 
@@ -158,7 +163,7 @@ class MyApp(ShowBase):
 			vec3_disp = vec_mul(celbody.vec3_velocity, dt)
 			x, y, z = celbody.node.getPos()
 			x += vec3_disp[0] * 10**-8  #
-			y += vec3_disp[1] * 10**-8  # convert from meters to panda3d units
+			y += vec3_disp[1] * 10**-8  # convert from meters to panda3d units (1 u = 10^8 m)
 			z += vec3_disp[2] * 10**-8  #
 			celbody.node.setPos(x, y, z)
 
