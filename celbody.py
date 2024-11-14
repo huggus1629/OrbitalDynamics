@@ -20,7 +20,9 @@ class CelBody:
 		self.mass = mass
 		self.vec3_velocity = vec3_velocity
 
-		self.frame_force = 0
+		self.l_vec3_f_forces = []
+		self.vec3_f_fres = 0
+		self.vec3_f_accel = 0
 
 	# returns distance (center to center) to other celbody
 	def distance(self, celbody):
