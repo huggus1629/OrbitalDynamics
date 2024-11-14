@@ -30,3 +30,10 @@ class CelBody:
 		x2, y2, z2 = celbody.node.getPos()
 		return math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)
 		#return self.node.getDistance(celbody.node)
+
+	# returns vector from self to celbody
+	def vec3_r(self, celbody):
+		x1, y1, z1 = self.node.getPos()
+		x2, y2, z2 = celbody.node.getPos()
+		return tuple((x2 - x1, y2 - y1, z2 - z1))
+	
