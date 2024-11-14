@@ -18,3 +18,8 @@ def vec_sum(l_vec: list[tuple]):
 			fres[i] += vec[i]
 
 	return tuple(fres)
+
+
+# multiplies vector by scalar
+def vec_mul(vec: tuple[float], s) -> tuple[float, ...]:
+	return tuple(s * comp for comp in vec)
