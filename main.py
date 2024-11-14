@@ -10,7 +10,7 @@ import itertools as it
 from scipy import constants
 
 from celbody import CelBody
-from tools import digits_after_decimal
+from tools import *
 
 running_windows = False
 w, h = 1280, 720
