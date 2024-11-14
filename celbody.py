@@ -6,7 +6,7 @@ import math
 
 
 class CelBody:
-	def __init__(self, base, name, model_path, mass, vec3_velocity: tuple[float]):
+	def __init__(self, base, name, model_path, mass, vec3_velocity: tuple[float, ...]):
 		self.node = NodePath(ModelNode(name))  # creates a ModelNode and wraps it in a NodePath
 		self.name = name
 
@@ -29,7 +29,6 @@ class CelBody:
 		x1, y1, z1 = self.node.getPos()
 		x2, y2, z2 = celbody.node.getPos()
 		return math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)
-		#return self.node.getDistance(celbody.node)
 
 	# returns vector from self to celbody
 	def vec3_r(self, celbody):
