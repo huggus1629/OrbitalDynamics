@@ -56,17 +56,15 @@ class MyApp(ShowBase):
 		# ----------------- celestial bodies conf -----------------
 		self.celbodies = []
 
-		self.testearth = CelBody(self, "planet", "./custom_models/sphere.gltf", 0, 0)
+		self.testearth = CelBody(self, "planet", "./custom_models/sphere.gltf", 6 * 10**24, 0)
 		self.testearth.node.setScale(60)
 		self.testearth.node.reparentTo(self.render)
-		self.testearth.mass = 6 * 10**24
 		self.celbodies.append(self.testearth)
 
-		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 0, 0)
+		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 7 * 10**22, 0)
 		self.testmoon.node.setScale(20)
 		self.testmoon.node.setPos(100, 0, 0)
 		self.testmoon.node.reparentTo(self.render)
-		self.testmoon.mass = 7 * 10**22
 		self.celbodies.append(self.testmoon)
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
