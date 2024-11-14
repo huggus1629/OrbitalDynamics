@@ -130,6 +130,8 @@ class MyApp(ShowBase):
 
 	# ================ END INIT ===================
 	def calc_forces(self, task):
+		dt = self.clock.dt
+
 		# for each pair of celbodies, calculate force
 		for pair in self.celbody_pairs:
 			force = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 2)
