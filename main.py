@@ -69,7 +69,7 @@ class MyApp(ShowBase):
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
 		# ----------------- end celestial bodies conf -----------------
-		print(self.celbodies[0].distance(self.celbodies[1]))
+		# print(self.celbodies[0].distance(self.celbodies[1]))
 
 		# disable default camera control
 		self.disableMouse()
@@ -134,10 +134,33 @@ class MyApp(ShowBase):
 
 		# for each pair of celbodies, calculate force
 		for pair in self.celbody_pairs:
-			force = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 2)
-			print(f"({force} = {constants.G} * {pair[0].mass} * {pair[1].mass} / ({pair[0].distance(pair[1])} ** 2))")
-			pair[0].frame_force = force
-			pair[1].frame_force = force
+			magnitude = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 3)
+			vec3_r = pair[0].vec3_r(pair[1])
+			vec3_force = vec_mul(vec3_r, magnitude)
+			# print(f"({magnitude} = {constants.G} * {pair[0].mass} * {pair[1].mass} / ({pair[0].distance(pair[1])} ** 2))")
+			pair[0].l_vec3_f_forces.append(vec3_force)
+			pair[1].l_vec3_f_forces.append(vec_neg(vec3_force))
+
+		for celbody in self.celbodies:
+			celbody.vec3_f_fres = vec_sum(celbody.l_vec3_f_forces)
+			celbody.l_vec3_f_forces.clear()  # clear individual forces after calculating fres
+
+			# using F = ma -> a = F/m calculate acceleration
+			celbody.vec3_f_accel = vec_mul(celbody.vec3_f_fres, 1/celbody.mass)
+
+			# using v = a * dt calculate velocity change and new velocity
+			vec3_dv = vec_mul(celbody.vec3_f_accel, dt)
+			celbody.vec3_velocity = vec_sum([celbody.vec3_velocity, vec3_dv])
+			print(dt)
+			print(f"{celbody.name}:\n\tFres = {celbody.vec3_f_fres}\n\ta = {celbody.vec3_f_accel}\n\tv = {celbody.vec3_velocity}")
+
+			# using s = v * dt calculate displacement
+			vec3_disp = vec_mul(celbody.vec3_velocity, dt)
+			x, y, z = celbody.node.getPos()
+			x += vec3_disp[0] * 10**-8  #
+			y += vec3_disp[1] * 10**-8  # convert from meters to panda3d units
+			z += vec3_disp[2] * 10**-8  #
+			celbody.node.setPos(x, y, z)
 
 		return task.cont
 
