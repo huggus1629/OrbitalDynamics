@@ -6,7 +6,7 @@ import math
 
 
 class CelBody:
-	def __init__(self, base, name, model_path, mass, vec3_velocity):
+	def __init__(self, base, name, model_path, mass, vec3_velocity: tuple[float]):
 		self.node = NodePath(ModelNode(name))  # creates a ModelNode and wraps it in a NodePath
 		self.name = name
 
@@ -18,7 +18,7 @@ class CelBody:
 
 		# given physical properties
 		self.mass = mass
-		self.vec3_velocity = vec3_velocity
+		self.vec3_velocity = list(vec3_velocity)
 
 		self.l_vec3_f_forces = []
 		self.vec3_f_fres = 0
@@ -36,4 +36,3 @@ class CelBody:
 		x1, y1, z1 = self.node.getPos()
 		x2, y2, z2 = celbody.node.getPos()
 		return tuple((x2 - x1, y2 - y1, z2 - z1))
-	
