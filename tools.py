@@ -9,12 +9,13 @@ def vec_neg(vec: tuple[float, ...]):
 
 # sums up a list of vectors
 def vec_sum(l_vec: list[tuple[float, ...]]):
-	dim = len(l_vec[0])
-	fres = [0.0 for _ in range(dim)]
+	dim = len(l_vec[0])  # determine the dimension of the vector by counting its components
+	fres = [0.0 for _ in range(dim)]  # initialize Fres vector with zeroes
 	for vec in l_vec:
-		if len(vec) != dim:
-			return
+		if len(vec) != dim:  # if the vectors don't have matching dimensions, return None
+			return None
 		for i in range(dim):
+			# for every component, add it to the corresponding component in Fres
 			fres[i] += vec[i]
 
 	return tuple(fres)

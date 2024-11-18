@@ -56,12 +56,12 @@ class MyApp(ShowBase):
 		# ----------------- celestial bodies conf -----------------
 		self.celbodies = []
 
-		self.testearth = CelBody(self, "planet", "./custom_models/sphere.gltf", 6 * 10**24, (0, 0, 0))
+		self.testearth = CelBody(self, "planet", "./custom_models/sphere.gltf", 6 * 10 ** 24, (0, 0, 0))
 		self.testearth.node.setScale(60)
 		self.testearth.node.reparentTo(self.render)
 		self.celbodies.append(self.testearth)
 
-		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 7 * 10**23, (0, 11500000000, 0))
+		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 7 * 10 ** 23, (0, 11500000000, 0))
 		self.testmoon.node.setScale(20)
 		self.testmoon.node.setPos(250, 0, 0)
 		self.testmoon.node.reparentTo(self.render)
@@ -138,33 +138,38 @@ class MyApp(ShowBase):
 	def calc_forces(self, task):
 		dt = self.clock.dt
 
-		# for each pair of celbodies, calculate force
+		# for each pair of celbodies, calculate force vector
 		for pair in self.celbody_pairs:
+			# newton's gravitational law (F = G*m1*m2/r^2 * ř)
 			magnitude = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 3)
 			vec3_r = pair[0].vec3_r(pair[1])
 			vec3_force = vec_mul(vec3_r, magnitude)
+
+			# append calculated vector to vector list
 			pair[0].l_vec3_f_forces.append(vec3_force)
 			pair[1].l_vec3_f_forces.append(vec_neg(vec3_force))
 
 		for celbody in self.celbodies:
-			celbody.vec3_f_fres = vec_sum(celbody.l_vec3_f_forces)
-			celbody.l_vec3_f_forces.clear()  # clear individual forces after calculating fres
+			celbody.vec3_f_fres = vec_sum(celbody.l_vec3_f_forces)  # sum up all forces exerted on the body
+			celbody.l_vec3_f_forces.clear()  # clear list of individual forces, making it ready for the next frame
 
 			# using F = ma -> a = F/m calculate acceleration
-			celbody.vec3_f_accel = vec_mul(celbody.vec3_f_fres, 1/celbody.mass)
+			celbody.vec3_f_accel = vec_mul(celbody.vec3_f_fres, 1 / celbody.mass)
 
 			# using v = a * dt calculate velocity change and new velocity
-			vec3_dv = vec_mul(celbody.vec3_f_accel, dt)
-			celbody.vec3_velocity = vec_sum([celbody.vec3_velocity, vec3_dv])
-			print(dt)
-			print(f"{celbody.name}:\n\tFres = {celbody.vec3_f_fres}\n\ta = {celbody.vec3_f_accel}\n\tv = {celbody.vec3_velocity}")
+			vec3_f_dv = vec_mul(celbody.vec3_f_accel, dt)
+			celbody.vec3_velocity = vec_sum([celbody.vec3_velocity, vec3_f_dv])  # add dv to previous v
 
 			# using s = v * dt calculate displacement
-			vec3_disp = vec_mul(celbody.vec3_velocity, dt)
-			x, y, z = celbody.node.getPos()
-			x += vec3_disp[0] * 10**-8  #
-			y += vec3_disp[1] * 10**-8  # convert from meters to panda3d units (1 u = 10^8 m)
-			z += vec3_disp[2] * 10**-8  #
+			vec3_f_disp = vec_mul(celbody.vec3_velocity, dt)
+			x, y, z = celbody.node.getPos()  # get xyz coords
+
+			# add xyz components of displacement vector to corresponding variable
+			x += vec3_f_disp[0] * 10 ** -8  #
+			y += vec3_f_disp[1] * 10 ** -8  # convert from meters to panda3d units (1 u = 10^8 m)
+			z += vec3_f_disp[2] * 10 ** -8  #
+
+			# set the newly calculated position
 			celbody.node.setPos(x, y, z)
 
 		return task.cont
