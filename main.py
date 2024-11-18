@@ -67,12 +67,6 @@ class MyApp(ShowBase):
 		self.testmoon.node.reparentTo(self.render)
 		self.celbodies.append(self.testmoon)
 
-		# self.testmoon = CelBody(self, "moon2", "./custom_models/sphere.gltf", 7 * 10 ** 20, (0, 1150000000, 0))
-		# self.testmoon.node.setScale(5)
-		# self.testmoon.node.setPos(250, 100, 0)
-		# self.testmoon.node.reparentTo(self.render)
-		# self.celbodies.append(self.testmoon)
-
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
 		# ----------------- end celestial bodies conf -----------------
 		# print(self.celbodies[0].distance(self.celbodies[1]))
