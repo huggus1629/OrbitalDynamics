@@ -166,7 +166,7 @@ class MyApp(ShowBase):
 
 			# add xyz components of displacement vector to corresponding variable
 			x += vec3_f_disp[0] * 10 ** -8  #
-			y += vec3_f_disp[1] * 10 ** -8  # convert from meters to panda3d units (1 u = 10^8 m)
+			y += vec3_f_disp[1] * 10 ** -8  # convert from meters to panda3d units (personal definition: 1 u = 10^8 m)
 			z += vec3_f_disp[2] * 10 ** -8  #
 
 			# set the newly calculated position
