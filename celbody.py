@@ -21,6 +21,8 @@ class CelBody:
 		self.radius = radius
 		self.node.setScale(self.radius)
 
+		self.motiontrail_pts = [init_pos]
+
 		# given physical properties
 		self.mass = mass
 		self.vec3_velocity = list(vec3_velocity)
@@ -43,3 +45,6 @@ class CelBody:
 		x1, y1, z1 = self.node.getPos()
 		x2, y2, z2 = celbody.node.getPos()
 		return tuple((x2 - x1, y2 - y1, z2 - z1))
+
+	def update_motion_trail(self):
+		self.motiontrail_pts.append(self.node.getPos())
