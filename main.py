@@ -50,22 +50,22 @@ class MyApp(ShowBase):
 		self.skybox.reparentTo(self.render)
 
 		self.axis = self.loader.loadModel('models/zup-axis')
-		self.axis.setScale(10)
+		self.axis.setScale(1)
 		self.axis.reparentTo(self.render)
 
 		# ----------------- celestial bodies conf -----------------
 		self.celbodies = []
 
-		self.testearth = CelBody(self, "planet", "./custom_models/sphere.gltf", 6 * 10 ** 24, (0, 0, 0))
-		self.testearth.node.setScale(60)
-		self.testearth.node.reparentTo(self.render)
-		self.celbodies.append(self.testearth)
+		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", 1.989 * 10 ** 30, (0, 0, 0))
+		self.sun.node.setScale(6.9634)
+		self.sun.node.reparentTo(self.render)
+		self.celbodies.append(self.sun)
 
-		self.testmoon = CelBody(self, "moon", "./custom_models/sphere.gltf", 7 * 10 ** 23, (0, 11500000000, 0))
-		self.testmoon.node.setScale(20)
-		self.testmoon.node.setPos(250, 0, 0)
-		self.testmoon.node.reparentTo(self.render)
-		self.celbodies.append(self.testmoon)
+		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", 5.972 * 10 ** 24, (0, 29785, 0))
+		self.earth.node.setScale(0.06371)
+		self.earth.node.setPos(1472.8, 0, 0)
+		self.earth.node.reparentTo(self.render)
+		self.celbodies.append(self.earth)
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
 		# ----------------- end celestial bodies conf -----------------
@@ -103,7 +103,7 @@ class MyApp(ShowBase):
 		# ----- end button definitions -----
 
 		# camera speed
-		self.cam_spd_increment = 10
+		self.cam_spd_increment = 0.1
 		self.cam_base_spd = round(float(1), digits_after_decimal(self.cam_spd_increment))
 
 		self.accept("arrow_up", self.camera_change_speed, [True])
@@ -120,6 +120,7 @@ class MyApp(ShowBase):
 		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 6)
 		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 7)
 		self.cam_fov_text = self.genLabelText(f"Cam FOV = {self.camLens.getFov()[0]}", 9)
+		self.earthpos_text = self.genLabelText(f"Earth pos = (--, --, --)", 11)
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
@@ -165,6 +166,8 @@ class MyApp(ShowBase):
 
 			# set the newly calculated position
 			celbody.node.setPos(x, y, z)
+			self.earthpos_text.text = f"Earth pos = ({x}, {y}, {z})"
+		# celbody.motiontrail.update_motion_trail(self.clock.getRealTime(), [x, y, z])
 
 		return task.cont
 
