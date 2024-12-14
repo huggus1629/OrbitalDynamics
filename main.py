@@ -159,9 +159,9 @@ class MyApp(ShowBase):
 			x, y, z = celbody.node.getPos()  # get xyz coords
 
 			# add xyz components of displacement vector to corresponding variable
-			x += vec3_f_disp[0] * 10 ** -8  #
-			y += vec3_f_disp[1] * 10 ** -8  # convert from meters to panda3d units (personal definition: 1 u = 10^8 m)
-			z += vec3_f_disp[2] * 10 ** -8  #
+			x += m_to_u(vec3_f_disp[0])  #
+			y += m_to_u(vec3_f_disp[1])  # convert from meters to panda3d units (personal definition: 1 u = 10^8 m)
+			z += m_to_u(vec3_f_disp[2])  #
 
 			# set the newly calculated position
 			celbody.node.setPos(x, y, z)

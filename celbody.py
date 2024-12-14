@@ -1,8 +1,9 @@
+import math
+
 from direct.showbase.Loader import Loader
-from direct.showbase.ShowBase import ShowBase
 from panda3d.core import NodePath, ModelNode
 
-import math
+from tools import u_to_m
 
 
 class CelBody:
@@ -30,10 +31,10 @@ class CelBody:
 	def distance(self, celbody):
 		x1, y1, z1 = self.node.getPos()
 		x2, y2, z2 = celbody.node.getPos()
-		return math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)
+		return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
 
 	def distance_m(self, celbody):
-		return self.distance(celbody)*10**8
+		return u_to_m(self.distance(celbody))
 
 	# returns vector from self to celbody
 	def vec3_r(self, celbody):
