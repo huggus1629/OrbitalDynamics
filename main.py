@@ -56,13 +56,11 @@ class MyApp(ShowBase):
 		# ----------------- celestial bodies conf -----------------
 		self.celbodies = []
 
-		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), 1.989 * 10 ** 30, (0, 0, 0))
-		self.sun.node.setScale(6.9634)
+		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), 6.9634, 1.989 * 10 ** 30, (0, 0, 0))
 		self.sun.node.reparentTo(self.render)
 		self.celbodies.append(self.sun)
 
-		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 5.972 * 10 ** 24, (0, 29785, 0))
-		self.earth.node.setScale(0.06371)
+		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 0.06371, 5.972 * 10 ** 24, (0, 29785, 0))
 		self.earth.node.reparentTo(self.render)
 		self.celbodies.append(self.earth)
 

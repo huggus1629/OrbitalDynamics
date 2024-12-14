@@ -7,7 +7,7 @@ from tools import u_to_m
 
 
 class CelBody:
-	def __init__(self, base, name, model_path, init_pos, mass, vec3_velocity: tuple[float, ...]):
+	def __init__(self, base, name, model_path, init_pos, radius, mass, vec3_velocity: tuple[float, ...]):
 		self.node = NodePath(ModelNode(name))  # creates a ModelNode and wraps it in a NodePath
 		self.name = name
 
@@ -18,6 +18,8 @@ class CelBody:
 		self.model.reparentTo(self.node)
 
 		self.node.setPos(init_pos)
+		self.radius = radius
+		self.node.setScale(self.radius)
 
 		# given physical properties
 		self.mass = mass
