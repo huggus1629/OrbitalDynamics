@@ -2,6 +2,12 @@ def digits_after_decimal(x):
 	return len(str(float(x)).split('.')[1])
 
 
+def u_to_m(u): return u * 10 ** 8
+
+
+def m_to_u(m): return m / 10 ** 8
+
+
 # flips sign of vector
 def vec_neg(vec: tuple[float, ...]):
 	return tuple(- comp for comp in vec)
