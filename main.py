@@ -136,7 +136,7 @@ class MyApp(ShowBase):
 		# for each pair of celbodies, calculate force vector
 		for pair in self.celbody_pairs:
 			# newton's gravitational law (F = G*m1*m2/r^2 * ř)
-			magnitude = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance(pair[1]) ** 3)
+			magnitude = constants.G * pair[0].mass * pair[1].mass / (pair[0].distance_m(pair[1]) ** 3)
 			vec3_r = pair[0].vec3_r(pair[1])
 			vec3_force = vec_mul(vec3_r, magnitude)
 
