@@ -1,9 +1,8 @@
 import math
 
 from direct.showbase.Loader import Loader
-from panda3d.core import NodePath, ModelNode
+from panda3d.core import NodePath, ModelNode, LRGBColor
 
-from motiontrail import MotionTrail
 from tools import u_to_m, vec_mul
 
 
@@ -50,3 +49,13 @@ class CelBody:
 	# returns vector (in meters) from self to celbody
 	def vec3m_r(self, celbody):
 		return vec_mul(self.vec3u_r(celbody), 10**8)
+
+
+class MotionTrail:
+	def __init__(self, parent_celbody: CelBody, init_pos):
+		self.parent = parent_celbody
+		self.motiontrail_pts = [init_pos]
+		self.motiontrail_color = LRGBColor(255, 0, 0)
+
+	def update_motion_trail(self):
+		self.motiontrail_pts.append(self.parent.node.getPos())
