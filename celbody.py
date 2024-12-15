@@ -3,7 +3,7 @@ import math
 from direct.showbase.Loader import Loader
 from panda3d.core import NodePath, ModelNode
 
-from tools import u_to_m
+from tools import u_to_m, vec_mul
 
 
 class CelBody:
@@ -40,11 +40,15 @@ class CelBody:
 	def distance_m(self, celbody):
 		return u_to_m(self.distance(celbody))
 
-	# returns vector from self to celbody
-	def vec3_r(self, celbody):
+	# returns vector (in units) from self to celbody
+	def vec3u_r(self, celbody):
 		x1, y1, z1 = self.node.getPos()
 		x2, y2, z2 = celbody.node.getPos()
 		return tuple((x2 - x1, y2 - y1, z2 - z1))
+
+	# returns vector (in meters) from self to celbody
+	def vec3m_r(self, celbody):
+		return vec_mul(self.vec3u_r(celbody), 10**8)
 
 	def update_motion_trail(self):
 		self.motiontrail_pts.append(self.node.getPos())
