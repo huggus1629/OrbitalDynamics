@@ -1,13 +1,14 @@
 from math import pi, sin, cos
 
 from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton
+from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton, ClockObject
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 
 import platform
 import itertools as it
 from scipy import constants
+import datetime
 
 from celbody import CelBody
 from tools import *
@@ -36,6 +37,11 @@ loadPrcFileData("", confVars)
 class MyApp(ShowBase):
 	def __init__(self):
 		ShowBase.__init__(self)
+
+		# get the target frame rate directly from the graphics pipe
+		display_info = self.pipe.getDisplayInformation()
+		self.framerate = display_info.getDisplayModeRefreshRate(display_info.getCurrentDisplayModeIndex())
+
 		kb = KeyboardButton()
 
 		self.camLens.setFov(90)  # passing only horizontal fov automatically calculates vertical fov
@@ -112,6 +118,8 @@ class MyApp(ShowBase):
 
 		# some debug text
 		self.realtime_elapsed_text = self.genLabelText(f"Realtime elapsed = -- s", 1)
+		self.vtime_elapsed_text = self.genLabelText(f"Virtual time elapsed = ", 2)
+
 		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 3)
 		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 5)
 		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 6)
@@ -119,16 +127,27 @@ class MyApp(ShowBase):
 		self.cam_fov_text = self.genLabelText(f"Cam FOV = {self.camLens.getFov()[0]}", 9)
 		self.earthpos_text = self.genLabelText(f"Earth pos = (--, --, --)", 11)
 
+		self.vClock = ClockObject(ClockObject.M_non_real_time)
+
+		self.clock.reset()
+		self.vClock.reset()
+
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
 		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
+		self.taskMgr.add(self.update_vclock, "VirtualClockUpdater")
 		self.taskMgr.add(self.update_time_counter, "TimeCounterUpdater")
 
 		self.taskMgr.add(self.calc_forces, "ForceUpdater")
 
 	# ================ END INIT ===================
+	def update_vclock(self, task):
+		self.vClock.setFrameRate(self.framerate / (365*24*60))
+		self.vClock.tick()
+		return task.cont
+
 	def calc_forces(self, task):
-		dt = self.clock.dt
+		dt = self.vClock.dt
 
 		# for each pair of celbodies, calculate force vector
 		for pair in self.celbody_pairs:
@@ -169,7 +188,8 @@ class MyApp(ShowBase):
 		return task.cont
 
 	def update_time_counter(self, task):
-		self.realtime_elapsed_text.text = f"Realtime elapsed = {round(self.clock.getRealTime(), 3)} s"
+		self.realtime_elapsed_text.text = f"Realtime elapsed = {round(self.clock.getFrameTime(), 3)} s"
+		self.vtime_elapsed_text.text = f"Virtual time elapsed = {datetime.timedelta(seconds=self.vClock.getFrameTime())}"
 
 		return task.cont
 
