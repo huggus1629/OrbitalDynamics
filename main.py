@@ -114,8 +114,6 @@ class MyApp(ShowBase):
 		self.accept("arrow_down", self.camera_change_speed, [False])
 		self.accept("arrow_down-repeat", self.camera_change_speed, [False])
 
-		# TODO menu
-
 		# some debug text
 		self.realtime_elapsed_text = self.genLabelText(f"Realtime elapsed = -- s", 1)
 		self.vtime_elapsed_text = self.genLabelText(f"Virtual time elapsed = ", 2)
