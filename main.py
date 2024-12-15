@@ -183,7 +183,7 @@ class MyApp(ShowBase):
 			# set the newly calculated position
 			celbody.node.setPos(x, y, z)
 			self.earthpos_text.text = f"Earth pos = ({x}, {y}, {z})"
-		# celbody.motiontrail.update_motion_trail(self.clock.getRealTime(), [x, y, z])
+			celbody.trail.update_motion_trail()
 
 		return task.cont
 

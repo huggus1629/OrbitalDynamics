@@ -3,6 +3,7 @@ import math
 from direct.showbase.Loader import Loader
 from panda3d.core import NodePath, ModelNode
 
+from motiontrail import MotionTrail
 from tools import u_to_m, vec_mul
 
 
@@ -21,7 +22,7 @@ class CelBody:
 		self.radius = radius
 		self.node.setScale(self.radius)
 
-		self.motiontrail_pts = [init_pos]
+		self.trail = MotionTrail(self, init_pos)
 
 		# given physical properties
 		self.mass = mass
@@ -49,6 +50,3 @@ class CelBody:
 	# returns vector (in meters) from self to celbody
 	def vec3m_r(self, celbody):
 		return vec_mul(self.vec3u_r(celbody), 10**8)
-
-	def update_motion_trail(self):
-		self.motiontrail_pts.append(self.node.getPos())
