@@ -114,21 +114,23 @@ class MyApp(ShowBase):
 		self.accept("arrow_down", self.camera_change_speed, [False])
 		self.accept("arrow_down-repeat", self.camera_change_speed, [False])
 
+		self.accept("p", self.toggle_sim_state)  # toggle simulation pause state on p keypress
+
+		self.vClock = ClockObject(ClockObject.M_non_real_time)  # create virtual timer by which the simulation runs
+		self.vClock_speed = 365*24*60  # time factor
+		self.running = False  # opens simulation in paused state
+		self.clock.reset()
+		self.vClock.reset()
+
 		# some debug text
 		self.realtime_elapsed_text = self.genLabelText(f"Realtime elapsed = -- s", 1)
 		self.vtime_elapsed_text = self.genLabelText(f"Virtual time elapsed = ", 2)
 
-		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 3)
-		self.cam_hdg_text = self.genLabelText(f"Cam heading = --°", 5)
-		self.cam_ptc_text = self.genLabelText(f"Cam pitch = --°", 6)
+		self.sim_running_text = self.genLabelText("", 4)
+		self.update_sim_text(self.running)
+
+		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 6)
 		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 7)
-		self.cam_fov_text = self.genLabelText(f"Cam FOV = {self.camLens.getFov()[0]}", 9)
-		self.earthpos_text = self.genLabelText(f"Earth pos = (--, --, --)", 11)
-
-		self.vClock = ClockObject(ClockObject.M_non_real_time)
-
-		self.clock.reset()
-		self.vClock.reset()
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
@@ -139,12 +141,26 @@ class MyApp(ShowBase):
 		self.taskMgr.add(self.calc_forces, "ForceUpdater")
 
 	# ================ END INIT ===================
+	def toggle_sim_state(self):
+		self.running = not self.running  # flip state
+		self.update_sim_text(self.running)
+
+	def update_sim_text(self, running):
+		if running:  # if running
+			self.sim_running_text.text = f"Simulation running @ {self.vClock_speed}x speed"
+		else:  # if paused
+			self.sim_running_text.text = f"Simulation paused (continue @ {self.vClock_speed}x speed)"
+
 	def update_vclock(self, task):
-		self.vClock.setFrameRate(self.framerate / (365*24*60))
-		self.vClock.tick()
+		if self.running:
+			self.vClock.setFrameRate(self.framerate / self.vClock_speed)
+			self.vClock.tick()
 		return task.cont
 
 	def calc_forces(self, task):
+		if not self.running:
+			return task.cont
+
 		dt = self.vClock.dt
 
 		# for each pair of celbodies, calculate force vector
@@ -180,7 +196,6 @@ class MyApp(ShowBase):
 
 			# set the newly calculated position
 			celbody.node.setPos(x, y, z)
-			self.earthpos_text.text = f"Earth pos = ({x}, {y}, {z})"
 			celbody.trail.update_motion_trail()
 
 		return task.cont
@@ -302,9 +317,6 @@ class MyApp(ShowBase):
 		ptc = max(-90, min(90, ptc))  # clamps pitch to +-90°
 
 		self.camera.setHpr(hdg, ptc, rll)
-
-		self.cam_hdg_text.text = f"Cam heading = {hdg:.3f}°"
-		self.cam_ptc_text.text = f"Cam pitch = {ptc:.3f}°"
 
 		self.reset_mouse()  # recenters mouse pointer
 
