@@ -60,19 +60,18 @@ class MyApp(ShowBase):
 		self.axis.reparentTo(self.render)
 
 		# ----------------- celestial bodies conf -----------------
-		self.celbodies = []
+		self.celbodies = []  # save all celestial bodies in this list
 
-		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), 6.9634, 1.989 * 10 ** 30, (0, 0, 0))
+		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), 100, 1.989 * 10 ** 30, (0, 0, 0))
 		self.sun.node.reparentTo(self.render)
 		self.celbodies.append(self.sun)
 
-		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 0.06371, 5.972 * 10 ** 24, (0, 29785, 0))
+		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 50, 5.972 * 10 ** 24, (0, 29785, 0))
 		self.earth.node.reparentTo(self.render)
 		self.celbodies.append(self.earth)
 
-		self.celbody_pairs = list(it.combinations(self.celbodies, 2))
+		self.celbody_pairs = list(it.combinations(self.celbodies, 2))  # save all possible pairs in a list
 		# ----------------- end celestial bodies conf -----------------
-		# print(self.celbodies[0].distance(self.celbodies[1]))
 
 		# disable default camera control
 		self.disableMouse()
@@ -88,7 +87,7 @@ class MyApp(ShowBase):
 		self.win_focused = True
 
 		self.accept("window-event", self.handle_window_event)  # detects focus change
-		self.accept("escape", self.userExit)
+		self.accept("escape", self.userExit)  # quit on esc
 
 		# "The name of this class is a bit misleading -
 		# it listens for keyboard events as well."
@@ -212,7 +211,7 @@ class MyApp(ShowBase):
 
 		:param inc: ``True`` when increasing, ``False`` when decreasing speed
 		"""
-		inc = 1 if inc else -1  # convert bool to factor
+		inc = 1 if inc else -1  # convert boolean argument to pos/neg factor
 		self.cam_base_spd += inc * self.cam_spd_increment
 		# cam speed can't go below min increment
 		rnd_digits = digits_after_decimal(self.cam_spd_increment)
