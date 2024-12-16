@@ -66,7 +66,8 @@ class MyApp(ShowBase):
 		self.sun.node.reparentTo(self.render)
 		self.celbodies.append(self.sun)
 
-		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 50, 5.972 * 10 ** 24, (0, 29785, 0))
+		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 50, 5.972 * 10 ** 24,
+							(0, 29785, 0))
 		self.earth.node.reparentTo(self.render)
 		self.celbodies.append(self.earth)
 
@@ -116,7 +117,7 @@ class MyApp(ShowBase):
 		self.accept("p", self.toggle_sim_state)  # toggle simulation pause state on p keypress
 
 		self.vClock = ClockObject(ClockObject.M_non_real_time)  # create virtual timer by which the simulation runs
-		self.vClock_speed = 365*24*60  # time factor
+		self.vClock_speed = 365 * 24 * 60  # time factor
 		self.running = False  # opens simulation in paused state
 		self.clock.reset()
 		self.vClock.reset()
