@@ -132,6 +132,23 @@ class MyApp(ShowBase):
 		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 6)
 		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 7)
 
+		self.helptext = self.genLabelText(
+			"""Move forwards - [W]
+Move backwards - [S]
+Move left - [A]
+Move right - [D]
+Move up - [Space]
+Move down - [LCtrl]
+Speed boost - [LShift]
+
+Increase cam speed - [ArrowUp]
+Decrease cam speed - [ArrowDown]
+
+Play/Pause Simulation - [P]
+
+Quit - [Esc]""",
+			9)
+
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
 		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
