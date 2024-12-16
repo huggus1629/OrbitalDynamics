@@ -265,7 +265,7 @@ class MyApp(ShowBase):
 		"""Macro for nice onscreen text (code taken from official Panda3D sample programs)"""
 
 		return OnscreenText(text=text, pos=(0.06, -.06 * (i + 0.5)), fg=(1, 1, 1, 1), parent=self.a2dTopLeft,
-							align=TextNode.ALeft, scale=.04)
+							align=TextNode.ALeft, scale=.05)
 
 	def handle_window_event(self, window):
 		"""Handles when the window gains or loses focus"""
