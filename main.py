@@ -62,14 +62,19 @@ class MyApp(ShowBase):
 		# ----------------- celestial bodies conf -----------------
 		self.celbodies = []  # save all celestial bodies in this list
 
-		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), 100, 1.989 * 10 ** 30, (0, 0, 0))
+		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), m_to_u(696340000), 1.989 * 10 ** 30, (0, 0, 0))
 		self.sun.node.reparentTo(self.render)
 		self.celbodies.append(self.sun)
 
-		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 50, 5.972 * 10 ** 24,
+		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), m_to_u(6378000), 5.972 * 10 ** 24,
 							(0, 29785, 0))
 		self.earth.node.reparentTo(self.render)
 		self.celbodies.append(self.earth)
+
+		self.moon = CelBody(self, "moon", "./custom_models/sphere.gltf", (1472.8+m_to_u(384.4*10**6), 0, 0), m_to_u(1737400),
+							7.34767309*10**22, (0, 29785+1023.06, 0))
+		self.moon.node.reparentTo(self.render)
+		self.celbodies.append(self.moon)
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))  # save all possible pairs in a list
 		# ----------------- end celestial bodies conf -----------------
@@ -117,7 +122,7 @@ class MyApp(ShowBase):
 		self.accept("p", self.toggle_sim_state)  # toggle simulation pause state on p keypress
 
 		self.vClock = ClockObject(ClockObject.M_non_real_time)  # create virtual timer by which the simulation runs
-		self.vClock_speed = 365 * 24 * 60  # time factor
+		self.vClock_speed = 60*24*28  # time factor
 		self.running = False  # opens simulation in paused state
 		self.clock.reset()
 		self.vClock.reset()
