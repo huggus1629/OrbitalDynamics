@@ -63,11 +63,13 @@ class MyApp(ShowBase):
 		self.celbodies = []  # save all celestial bodies in this list
 
 		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), m_to_u(696340000), 1.989 * 10 ** 30, (0, 0, 0))
+		self.sun.node.setColor(1, 1, 0, 1)
 		self.sun.node.reparentTo(self.render)
 		self.celbodies.append(self.sun)
 
 		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), m_to_u(6378000), 5.972 * 10 ** 24,
 							(0, 29785, 0))
+		self.earth.node.setColor(0.1, 0.1, 1, 1)
 		self.earth.node.reparentTo(self.render)
 		self.celbodies.append(self.earth)
 
