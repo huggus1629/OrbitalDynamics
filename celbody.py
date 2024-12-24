@@ -7,7 +7,7 @@ from tools import u_to_m, vec_mul
 
 
 class CelBody:
-	def __init__(self, base, name, model_path, init_pos, radius, mass, vec3_velocity: tuple[float, ...]):
+	def __init__(self, base, name, model_path, init_pos, radius, mass, vec3_velocity: tuple[float, ...], color):
 		self.node = NodePath(ModelNode(name))  # creates a ModelNode and wraps it in a NodePath
 		self.name = name
 
@@ -20,6 +20,9 @@ class CelBody:
 		self.node.setPos(init_pos)
 		self.radius = radius
 		self.node.setScale(self.radius)
+
+		self.color = color
+		self.node.setColor(self.color)
 
 		self.trail = MotionTrail(self, init_pos)
 

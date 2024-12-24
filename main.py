@@ -9,6 +9,7 @@ import platform
 import itertools as it
 from scipy import constants
 import datetime
+import json
 
 from celbody import CelBody
 from tools import *
@@ -63,21 +64,35 @@ class MyApp(ShowBase):
 		# ----------------- celestial bodies conf -----------------
 		self.celbodies = []  # save all celestial bodies in this list
 
-		self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), m_to_u(696340000), 1.989 * 10 ** 30, (0, 0, 0))
-		self.sun.node.setColor(1, 1, 0, 1)
-		self.sun.node.reparentTo(self.render)
-		self.celbodies.append(self.sun)
+		# parse celestial bodies from json
+		with open("config.json", "r") as config:
+			# read json file as text and parse it into list/dict
+			self.raw_celbodies = json.loads(config.read())
 
-		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), m_to_u(6378000), 5.972 * 10 ** 24,
-							(0, 29785, 0))
-		self.earth.node.setColor(0.1, 0.1, 1, 1)
-		self.earth.node.reparentTo(self.render)
-		self.celbodies.append(self.earth)
+		for cb in self.raw_celbodies:
+			# some shortcuts
+			ip = cb['init_pos_m']
+			r = cb['radius_m']
+			m = cb['mass_kg']
+			iv = cb['vec3_init_velocity']
+			c_rgb = cb['rgb_color']
+			# map values from 0-255 to float between 0 and 1 (required by panda3d)
+			c_rgba = (c_rgb['r'] / 255, c_rgb['g'] / 255, c_rgb['b'] / 255, 1)
 
-		self.moon = CelBody(self, "moon", "./custom_models/sphere.gltf", (1472.8+m_to_u(384.4*10**6), 0, 0), m_to_u(1737400),
-							7.34767309*10**22, (0, 29785+1023.06, 0))
-		self.moon.node.reparentTo(self.render)
-		self.celbodies.append(self.moon)
+			self.celbodies.append(CelBody(self,
+										cb['name'],
+										cb['model_path'],
+										(m_to_u(ip['x']), m_to_u(ip['y']), m_to_u(ip['z'])),
+										m_to_u(r['mantissa'] * 10 ** r['exponent']),
+										m['mantissa'] * 10 ** m['exponent'],
+										(iv['x'], iv['y'], iv['z']),
+										c_rgba))
+
+		for cb in self.celbodies:
+			# render all nodes
+			cb.node.reparentTo(self.render)
+
+		# TODO check for duplicate names (-> error)
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))  # save all possible pairs in a list
 		# ----------------- end celestial bodies conf -----------------
