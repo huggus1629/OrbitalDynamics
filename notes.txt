@@ -1,6 +1,37 @@
-def: skybox (94608 units)^3 [approx 1e-3 ly]
--> 9.4608e4 u = 9.4608e9 m
--> 10^4 u = 10^9 m
+def: skybox (94607*2 units)^3 [approx 2e-3 ly]
+-> 9.4607e4 u := 9.4607e12 m
+-> 10^4 u = 10^12 m
 
-=> 1 u = 10^5 m
-=> 1 m = 10^-5 u
+=> 1 u = 10^8 m
+=> 1 m = 10^-8 u
+
+self.sun = CelBody(self, "sun", "./custom_models/sphere.gltf", (0, 0, 0), 6.9634, 1.989 * 10 ** 30, (0, 0, 0))
+		self.sun.node.reparentTo(self.render)
+		self.celbodies.append(self.sun)
+
+		self.earth = CelBody(self, "earth", "./custom_models/sphere.gltf", (1472.8, 0, 0), 0.06371, 5.972 * 10 ** 24, (0, 29785, 0))
+		self.earth.node.reparentTo(self.render)
+		self.celbodies.append(self.earth)
+
+
+
+		# trail = MotionTrail(name + "_trail", self.model)
+		# trail.register_motion_trail()
+		# trail.geom_node_path.reparent_to(base.render)
+		# trail.time_window = 100
+		# trail.add_vertex(Point3(-0.1, 0, -0.1))  # define square (arbitrary)
+		# trail.add_vertex(Point3(0.1, 0, -0.1))
+		# trail.add_vertex(Point3(0.1, 0, 0.1))
+		# trail.add_vertex(Point3(0.1, 0, -0.1))
+		#
+		# trail.set_vertex_color(0, Vec4(0, 0, 1, 1), Vec4(0, 0, 1, 0))
+		# trail.set_vertex_color(1, Vec4(0, 0, 1, 1), Vec4(0, 0, 1, 0))
+		# trail.set_vertex_color(2, Vec4(0, 0, 1, 1), Vec4(0, 0, 1, 0))
+		# trail.set_vertex_color(3, Vec4(0, 0, 1, 1), Vec4(0, 0, 1, 0))
+		#
+		# trail.update_vertices()
+
+radii
+sun: m_to_u(696340000)
+earth: m_to_u(6378000)
+moon: m_to_u(1737400)
