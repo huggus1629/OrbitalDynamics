@@ -46,6 +46,7 @@ class MyApp(ShowBase):
 
 		self.camLens.setFov(90)  # passing only horizontal fov automatically calculates vertical fov
 		self.camLens.set_far(330000)  # enough to look across skybox
+		self.camLens.set_near(0.1)
 
 		# set up skybox
 		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
