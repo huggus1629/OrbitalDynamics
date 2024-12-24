@@ -1,0 +1,26 @@
+[{
+	"name": "Sun",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 0,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 1.9885,
+		"exponent": 30
+	},
+	"mass_kg":
+	{
+		"mantissa": 1.9885,
+		"exponent": 30
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 0,
+		"z": 0
+	}
+}]
