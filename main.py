@@ -49,6 +49,8 @@ class MyApp(ShowBase):
 		self.camLens.set_far(330000)  # enough to look across skybox
 		self.camLens.set_near(0.1)
 
+		self.camera.setPos(1495, 0, 0)
+
 		# set up skybox
 		self.skybox = self.loader.loadModel('skybox/skybox.gltf')
 		self.skybox.setScale(94607)
