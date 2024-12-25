@@ -29,4 +29,68 @@
 		"g": 255,
 		"b": 0
 	}
+},
+{
+	"name": "Earth",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 149598023000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 6.378137,
+		"exponent": 6
+	},
+	"mass_kg":
+	{
+		"mantissa": 5.972168,
+		"exponent": 24
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 29782.7,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 0,
+		"g": 0,
+		"b": 255
+	}
+},
+{
+	"name": "Moon",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 149982422000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 1738.1,
+		"exponent": 3
+	},
+	"mass_kg":
+	{
+		"mantissa": 7.346,
+		"exponent": 22
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 30804.7,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 255,
+		"g": 255,
+		"b": 255
+	}
 }]
