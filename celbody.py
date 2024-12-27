@@ -3,7 +3,7 @@ import math
 from direct.showbase.Loader import Loader
 from panda3d.core import NodePath, ModelNode, LineSegs
 
-from tools import u_to_m, vec_mul
+from tools import *
 
 
 class CelBody:
@@ -69,7 +69,15 @@ class MotionTrail:  # TODO optimizations
 	def update_motion_trail(self):
 		if len(self.trail_pts) == self.trail_max_len:  # if max len reached -> remove oldest point
 			self.trail_pts.pop(0)
-		self.trail_pts.append(self.parent.node.getPos())  # add current position to motion trail
+
+		pos = self.parent.node.getPos()
+		last_pos = self.trail_pts[-1]
+
+		# don't draw line if too close to previous point
+		if vec_mag(vec_sum([pos, vec_neg(last_pos)])) < 1:
+			return
+
+		self.trail_pts.append(pos)  # add current position to motion trail
 
 		self.trail_obj.moveTo(self.trail_pts[0])
 		for p in self.trail_pts[1:]:
