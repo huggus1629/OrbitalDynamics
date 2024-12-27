@@ -1,3 +1,6 @@
+import math
+
+
 def digits_after_decimal(x):
 	return len(str(float(x)).split('.')[1])
 
@@ -6,6 +9,11 @@ def u_to_m(u): return u * 10 ** 8
 
 
 def m_to_u(m): return m / 10 ** 8
+
+
+# returns magnitude of vector
+def vec_mag(vec: tuple[float, ...]):
+	return math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2)
 
 
 # flips sign of vector
