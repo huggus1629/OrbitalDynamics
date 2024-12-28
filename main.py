@@ -71,7 +71,16 @@ class MyApp(ShowBase):
 			# read json file as text and parse it into list/dict
 			self.raw_celbodies = json.loads(config.read())
 
-		for cb in self.raw_celbodies:
+		seen = set()
+		duplicates = set()  # store duplicates to notify user of duplicate entries
+
+		for i, cb in enumerate(self.raw_celbodies):
+			if cb['name'] in seen:
+				duplicates.add((cb['name'], i))
+				continue
+
+			seen.add(cb['name'])
+
 			# some shortcuts
 			ip = cb['init_pos_m']
 			r = cb['radius_m']
@@ -90,11 +99,16 @@ class MyApp(ShowBase):
 										(iv['x'], iv['y'], iv['z']),
 										c_rgba))
 
+		if duplicates:
+			print(f"There {'is' if len(duplicates) == 1 else 'are'} {len(duplicates)} "
+				f"duplicate {'entry' if len(duplicates) == 1 else 'entries'}:")
+			for d in sorted(list(duplicates), key=lambda x: x[1]):
+				print(f"\t-\t'{d[0]}' @ JSON pos. {d[1]}")
+			print("\nThey will not be added to the simulation\n")
+
 		for cb in self.celbodies:
 			# render all nodes
 			cb.node.reparentTo(self.render)
-
-		# TODO check for duplicate names (-> error)
 
 		self.celbody_pairs = list(it.combinations(self.celbodies, 2))  # save all possible pairs in a list
 		# ----------------- end celestial bodies conf -----------------
