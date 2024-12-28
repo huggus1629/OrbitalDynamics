@@ -74,7 +74,7 @@ class MotionTrail:
 		last_pos = self.trail_pts[-1]
 
 		# don't draw line if too close to previous point
-		if vec_mag(vec_sum([pos, vec_neg(last_pos)])) < 1:
+		if vec_mag(vec_sum([pos, vec_neg(last_pos)])) < 10:
 			return
 
 		self.trail_pts.append(pos)  # add current position to motion trail
