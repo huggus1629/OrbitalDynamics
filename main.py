@@ -1,17 +1,20 @@
+import datetime
+import itertools as it
+import json
+import platform
+import sys
 from math import pi, sin, cos
 
+from direct.gui.DirectEntry import DirectEntry
+from direct.gui.DirectLabel import DirectLabel
 from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton, ClockObject
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
-
-import platform
-import itertools as it
+from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton, ClockObject
 from scipy import constants
-import datetime
-import json
 
 from celbody import CelBody
+from menu import MenuInstance
 from tools import *
 
 running_windows = False
@@ -127,7 +130,9 @@ class MyApp(ShowBase):
 		self.win_focused = True
 
 		self.accept("window-event", self.handle_window_event)  # detects focus change
-		self.accept("escape", self.userExit)  # quit on esc
+
+		self.open_menus = []  # stores MenuInstances of any open dialogs/menus
+		self.accept("escape", self.esc_handler)  # handles escape press
 
 		# "The name of this class is a bit misleading -
 		# it listens for keyboard events as well."
@@ -155,8 +160,11 @@ class MyApp(ShowBase):
 
 		self.accept("p", self.toggle_sim_state)  # toggle simulation pause state on p keypress
 
+		self.accept("t", self.enter_sim_speed)  # show sim speed text entry box
+		self.accept("c", self.enter_cam_speed)  # show cam speed text entry box
+
 		self.vClock = ClockObject(ClockObject.M_non_real_time)  # create virtual timer by which the simulation runs
-		self.vClock_speed = 60*24*28  # time factor
+		self.vClock_speed = float(60*24*28)  # time factor
 		self.running = False  # opens simulation in paused state
 		self.clock.reset()
 		self.vClock.reset()
@@ -185,8 +193,12 @@ Decrease cam speed - [ArrowDown]
 
 Play/Pause Simulation - [P]
 
-Quit - [Esc]""",
+Close menu / Quit - [Esc]""",
 			9)
+
+		# init empty MenuInstances
+		self.sim_speed_entry = MenuInstance(None, False)
+		self.cam_speed_entry = MenuInstance(None, False)
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
@@ -197,7 +209,80 @@ Quit - [Esc]""",
 		self.taskMgr.add(self.calc_forces, "ForceUpdater")
 
 	# ================ END INIT ===================
+
+	# sets camera speed to custom value
+	def set_cam_speed(self, s_new_speed):
+		try:
+			new_speed = float(s_new_speed)
+		except ValueError:
+			print("Enter a valid number!", file=sys.stderr)
+			self.esc_handler()
+			self.enter_cam_speed()  # reopens in case of failed attempt
+			return
+
+		self.cam_base_spd = new_speed
+		self.esc_handler()
+
+	# brings up custom cam speed entry box
+	def enter_cam_speed(self):
+		if self.cam_speed_entry.is_open or self.sim_speed_entry.is_open:
+			# abort if it's already open
+			return
+
+		self.cam_speed_entry.menu_obj = DirectEntry(initialText=str(self.cam_base_spd),
+													scale=0.05,
+													numLines=1,
+													focus=True,
+													command=self.set_cam_speed)
+		cam_speed_entry_label = DirectLabel(parent=self.cam_speed_entry.menu_obj,
+											text='Enter desired camera movement speed:',
+											text_fg=(1, 1, 1, 1),
+											text_bg=(0, 0, 0, 1),
+											text_pos=(0, 2))
+
+		self.cam_speed_entry.is_open = True
+		self.open_menus.append(self.cam_speed_entry)
+
+	# sets simulation speed to custom value
+	def set_sim_speed(self, s_new_speed):
+		try:
+			new_speed = float(s_new_speed)
+		except ValueError:
+			print("Enter a valid number!", file=sys.stderr)
+			self.esc_handler()
+			self.enter_sim_speed()  # reopens in case of failed attempt
+			return
+
+		self.vClock_speed = new_speed
+		self.update_vclock(Task)
+		self.update_sim_text(self.running)
+		self.esc_handler()
+
+	# brings up custom simulation speed entry box
+	def enter_sim_speed(self):
+		if self.sim_speed_entry.is_open or self.cam_speed_entry.is_open:
+			# abort if it's already open
+			return
+
+		self.sim_speed_entry.menu_obj = DirectEntry(initialText=str(self.vClock_speed),
+													scale=0.05,
+													numLines=1,
+													focus=True,
+													command=self.set_sim_speed)
+		sim_speed_entry_label = DirectLabel(parent=self.sim_speed_entry.menu_obj,
+											text='Enter desired simulation speed:',
+											text_fg=(1, 1, 1, 1),
+											text_bg=(0, 0, 0, 1),
+											text_pos=(0, 2))
+
+		self.sim_speed_entry.is_open = True
+		self.open_menus.append(self.sim_speed_entry)
+
 	def toggle_sim_state(self):
+		if self.open_menus:
+			# if a MenuInstance is open, ignore p keypress
+			return
+
 		self.running = not self.running  # flip state
 		self.update_sim_text(self.running)
 
@@ -208,8 +293,8 @@ Quit - [Esc]""",
 			self.sim_running_text.text = f"Simulation paused (continue @ {self.vClock_speed}x speed)"
 
 	def update_vclock(self, task):
+		self.vClock.setFrameRate(self.framerate / self.vClock_speed)  # sets the time factor
 		if self.running:
-			self.vClock.setFrameRate(self.framerate / self.vClock_speed)
 			self.vClock.tick()
 		return task.cont
 
@@ -284,6 +369,9 @@ Quit - [Esc]""",
 
 	def update_camera_xyz(self, task):
 		"""Task for updating the camera's XYZ coordinates according to keyboard input (WASD by default)"""
+		if self.open_menus:
+			# ignore movement if there are open MenuInstances
+			return task.cont
 
 		cam_x, cam_y, cam_z = self.camera.getPos()
 		self.cam_pos_text.text = f"Cam xyz = ({cam_x:.3f}, {cam_y:.3f}, {cam_z:.3f})"
@@ -377,6 +465,14 @@ Quit - [Esc]""",
 		self.reset_mouse()  # recenters mouse pointer
 
 		return task.cont
+
+	# closes MenuInstance if applicable, otherwise quits app
+	def esc_handler(self):
+		if self.open_menus:
+			self.open_menus[-1].close()
+			self.open_menus.pop()
+		else:
+			self.userExit()
 
 
 app = MyApp()
