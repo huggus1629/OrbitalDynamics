@@ -217,7 +217,29 @@ Close menu / Quit - [Esc]"""
 
 		self.taskMgr.add(self.calc_forces, "ForceUpdater")
 
+		self.taskMgr.add(self.update_nametags, "NameTagUpdater")
+
 	# ================ END INIT ===================
+
+	# scale and rotate name tags according to camera position
+	def update_nametags(self, task):
+		for cb in self.celbodies:
+			x, y, z = cb.node.getPos()
+			cb.nametag_np.setPos(x, y, z + 1 + 1.2 * cb.radius)  # place name tag slightly above CelBody
+
+			h_nt, p_nt, r_nt = cb.nametag_np.getHpr()
+			x_nt, y_nt, z_nt = cb.nametag_np.getPos()
+			x_cam, y_cam, z_cam = self.camera.getPos()
+			# fancy math to get pitch and heading
+			new_p = math.degrees(math.atan((z_nt - z_cam)/(math.sqrt((x_cam - x_nt) ** 2 + (y_cam - y_nt) ** 2))))
+			new_h = math.degrees(math.atan2(y_cam - y_nt, x_cam - x_nt)) + 90
+			cb.nametag_np.setHpr(new_h, new_p, r_nt)
+
+			# make name tag bigger the further away camera is
+			d = math.sqrt((x_cam - x_nt) ** 2 + (y_cam - y_nt) ** 2 + (z_cam - z_nt) ** 2)
+			cb.nametag_np.setScale(0.1 * d)
+
+		return task.cont
 
 	# shows controls as long as H is held down
 	def toggle_helptext(self, show):

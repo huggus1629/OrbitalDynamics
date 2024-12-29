@@ -32,12 +32,10 @@ class CelBody:
 		self.nametag = TextNode(self.name)
 		self.nametag.setText(self.name)
 		self.nametag.setAlign(TextNode.ACenter)
-		self.nametag.setCardColor(0, 0, 0, 0.2)
+		self.nametag.setCardColor(0, 0, 0, 1)
 		self.nametag.setCardAsMargin(0, 0, 0, 0)
 		self.nametag.setCardDecal(True)
-		self.nametag_np = base.render.attachNewNode(self.nametag)
-		self.nametag_np.setPos(init_pos[0], init_pos[1], init_pos[2] + 1 + 1.2 * self.radius)
-		self.nametag_np.setScale(1)
+		self.nametag_np: NodePath = base.render.attachNewNode(self.nametag)
 
 		# given physical properties
 		self.mass = mass
