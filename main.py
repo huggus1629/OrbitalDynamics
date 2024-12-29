@@ -190,8 +190,10 @@ Speed boost - [LShift]
 
 Increase cam speed - [ArrowUp]
 Decrease cam speed - [ArrowDown]
+Enter custom cam speed - [C]
 
-Play/Pause Simulation - [P]
+Play/pause simulation - [P]
+Adjust simulation speed - [T]
 
 Close menu / Quit - [Esc]""",
 			9)
