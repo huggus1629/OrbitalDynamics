@@ -179,8 +179,13 @@ class MyApp(ShowBase):
 		self.cam_pos_text = self.genLabelText(f"Cam xyz = (--, --, --)", 6)
 		self.cam_spd_text = self.genLabelText(f"Cam speed = -- units/frame", 7)
 
-		self.helptext = self.genLabelText(
-			"""Move forwards - [W]
+		self.helptext_tip = self.genLabelText(f"Hold [H] to show controls", 9)
+
+		self.helptext_obj = None
+		self.helptext = \
+"""\
+Look around - [Mouse]
+Move forwards - [W]
 Move backwards - [S]
 Move left - [A]
 Move right - [D]
@@ -195,8 +200,10 @@ Enter custom cam speed - [C]
 Play/pause simulation - [P]
 Adjust simulation speed - [T]
 
-Close menu / Quit - [Esc]""",
-			9)
+Close menu / Quit - [Esc]"""
+
+		self.accept("h", self.toggle_helptext, [True])
+		self.accept("h-up", self.toggle_helptext, [False])
 
 		# init empty MenuInstances
 		self.sim_speed_entry = MenuInstance(None, False)
@@ -211,6 +218,16 @@ Close menu / Quit - [Esc]""",
 		self.taskMgr.add(self.calc_forces, "ForceUpdater")
 
 	# ================ END INIT ===================
+
+	# shows controls as long as H is held down
+	def toggle_helptext(self, show):
+		if self.open_menus:
+			return
+
+		if show:
+			self.helptext_obj = self.genLabelText(self.helptext, 11)
+		else:
+			self.helptext_obj.destroy()
 
 	# sets camera speed to custom value
 	def set_cam_speed(self, s_new_speed):
