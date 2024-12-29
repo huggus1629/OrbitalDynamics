@@ -1,13 +1,14 @@
 import math
 
 from direct.showbase.Loader import Loader
-from panda3d.core import NodePath, ModelNode, LineSegs
+from direct.showbase.ShowBase import ShowBase
+from panda3d.core import NodePath, ModelNode, LineSegs, TextNode
 
 from tools import *
 
 
 class CelBody:
-	def __init__(self, base, name, model_path, init_pos, radius, mass, vec3_velocity: tuple[float, ...], color):
+	def __init__(self, base: ShowBase, name, model_path, init_pos, radius, mass, vec3_velocity: tuple[float, ...], color):
 		self.node = NodePath(ModelNode(name))  # creates a ModelNode and wraps it in a NodePath
 		self.name = name
 
@@ -27,6 +28,16 @@ class CelBody:
 		self.node.setColor(self.color)
 
 		self.trail = MotionTrail(self, self.color, -1)
+
+		self.nametag = TextNode(self.name)
+		self.nametag.setText(self.name)
+		self.nametag.setAlign(TextNode.ACenter)
+		self.nametag.setCardColor(0, 0, 0, 0.2)
+		self.nametag.setCardAsMargin(0, 0, 0, 0)
+		self.nametag.setCardDecal(True)
+		self.nametag_np = base.render.attachNewNode(self.nametag)
+		self.nametag_np.setPos(init_pos[0], init_pos[1], init_pos[2] + 1 + 1.2 * self.radius)
+		self.nametag_np.setScale(1)
 
 		# given physical properties
 		self.mass = mass
