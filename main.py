@@ -225,7 +225,7 @@ Close menu / Quit - [Esc]"""
 	def update_nametags(self, task):
 		for cb in self.celbodies:
 			x, y, z = cb.node.getPos()
-			cb.nametag_np.setPos(x, y, z + 1 + 1.2 * cb.radius)  # place name tag slightly above CelBody
+			cb.nametag_np.setPos(x, y, z + 1.2 * cb.radius)  # place name tag slightly above CelBody
 
 			h_nt, p_nt, r_nt = cb.nametag_np.getHpr()
 			x_nt, y_nt, z_nt = cb.nametag_np.getPos()
