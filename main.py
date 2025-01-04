@@ -230,7 +230,7 @@ Close menu / Quit - [Esc]"""
 			x_nt, y_nt, z_nt = cb.nametag_np.getPos()
 			x_cam, y_cam, z_cam = self.camera.getPos()
 			# fancy math to get pitch and heading
-			new_p = math.degrees(math.atan((z_nt - z_cam)/(math.sqrt((x_cam - x_nt) ** 2 + (y_cam - y_nt) ** 2))))
+			new_p = math.degrees(math.atan2(z_nt - z_cam, math.sqrt((x_cam - x_nt) ** 2 + (y_cam - y_nt) ** 2)))
 			new_h = math.degrees(math.atan2(y_cam - y_nt, x_cam - x_nt)) + 90
 			cb.nametag_np.setHpr(new_h, new_p, 0)
 
