@@ -31,6 +31,70 @@
 	}
 },
 {
+	"name": "Mercury",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 57909000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 2.4405,
+		"exponent": 6
+	},
+	"mass_kg":
+	{
+		"mantissa": 3.301,
+		"exponent": 23
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 47360,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 160,
+		"g": 160,
+		"b": 160
+	}
+},
+{
+	"name": "Venus",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 108200000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 6.0158,
+		"exponent": 6
+	},
+	"mass_kg":
+	{
+		"mantissa": 4.8673,
+		"exponent": 24
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 35020,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 250,
+		"g": 250,
+		"b": 240
+	}
+},
+{
 	"name": "Earth",
 	"model_path": "./custom_models/sphere.gltf",
 	"init_pos_m":
@@ -91,6 +155,166 @@
 	{
 		"r": 255,
 		"g": 255,
+		"b": 255
+	}
+},
+{
+	"name": "Mars",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 227990000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 3.3962,
+		"exponent": 6
+	},
+	"mass_kg":
+	{
+		"mantissa": 6.417,
+		"exponent": 23
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 24070,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 250,
+		"g": 190,
+		"b": 160
+	}
+},
+{
+	"name": "Jupiter",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 778510000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 7.1492,
+		"exponent": 7
+	},
+	"mass_kg":
+	{
+		"mantissa": 1.89813,
+		"exponent": 27
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 13060,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 230,
+		"g": 210,
+		"b": 180
+	}
+},
+{
+	"name": "Saturn",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 1433400000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 6.0628,
+		"exponent": 7
+	},
+	"mass_kg":
+	{
+		"mantissa": 5.683,
+		"exponent": 26
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 9680,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 230,
+		"g": 230,
+		"b": 100
+	}
+},
+{
+	"name": "Uranus",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 2872400000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 2.5559,
+		"exponent": 7
+	},
+	"mass_kg":
+	{
+		"mantissa": 8.681,
+		"exponent": 25
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 6810,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 230,
+		"g": 230,
+		"b": 255
+	}
+},
+{
+	"name": "Neptune",
+	"model_path": "./custom_models/sphere.gltf",
+	"init_pos_m":
+	{
+		"x": 4514600000000,
+		"y": 0,
+		"z": 0
+	},
+	"radius_m":
+	{
+		"mantissa": 2.4764,
+		"exponent": 6
+	},
+	"mass_kg":
+	{
+		"mantissa": 1.024,
+		"exponent": 26
+	},
+	"vec3_init_velocity":
+	{
+		"x": 0,
+		"y": 5455,
+		"z": 0
+	},
+	"rgb_color":
+	{
+		"r": 240,
+		"g": 240,
 		"b": 255
 	}
 }]
