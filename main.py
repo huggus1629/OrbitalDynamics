@@ -1,16 +1,19 @@
 import datetime
 import itertools as it
 import json
+import math
 import platform
 import sys
 from math import pi, sin, cos
 
 from direct.gui.DirectEntry import DirectEntry
 from direct.gui.DirectLabel import DirectLabel
+from direct.gui.DirectOptionMenu import DirectOptionMenu
 from direct.gui.OnscreenText import OnscreenText
+from direct.interval.IntervalManager import ivalMgr
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
-from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton, ClockObject
+from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton, ClockObject, NodePath
 from scipy import constants
 
 from celbody import CelBody
@@ -42,6 +45,8 @@ class MyApp(ShowBase):
 	def __init__(self):
 		ShowBase.__init__(self)
 
+		self.camera: NodePath = self.camera
+
 		# get the target frame rate directly from the graphics pipe
 		display_info = self.pipe.getDisplayInformation()
 		self.framerate = display_info.getDisplayModeRefreshRate(display_info.getCurrentDisplayModeIndex())
@@ -50,7 +55,7 @@ class MyApp(ShowBase):
 
 		self.camLens.setFov(90)  # passing only horizontal fov automatically calculates vertical fov
 		self.camLens.set_far(330000)  # enough to look across skybox
-		self.camLens.set_near(0.1)
+		self.camLens.set_near(0.05)
 
 		self.camera.setPos(1495, 0, 0)
 
@@ -120,10 +125,10 @@ class MyApp(ShowBase):
 		self.disableMouse()
 
 		# sets confined mode and hides the cursor:
-		props = WindowProperties()
-		props.setCursorHidden(True)
-		props.setMouseMode(WindowProperties.M_confined)
-		self.win.requestProperties(props)
+		self.props = WindowProperties()
+		self.props.setCursorHidden(True)
+		self.props.setMouseMode(WindowProperties.M_confined)
+		self.win.requestProperties(self.props)
 
 		# some flags used for preserving camera orientation
 		self.mouse_centered = False
@@ -163,6 +168,8 @@ class MyApp(ShowBase):
 		self.accept("t", self.enter_sim_speed)  # show sim speed text entry box
 		self.accept("c", self.enter_cam_speed)  # show cam speed text entry box
 
+		self.accept("f", self.pause_then_exec, [self.trk_selection])
+
 		self.vClock = ClockObject(ClockObject.M_non_real_time)  # create virtual timer by which the simulation runs
 		self.vClock_speed = float(60*24*28)  # time factor
 		self.running = False  # opens simulation in paused state
@@ -200,6 +207,9 @@ Enter custom cam speed - [C]
 Play/pause simulation - [P]
 Adjust simulation speed - [T]
 
+Follow object - [F]
+Insert new object - [I] (WIP)
+
 Close menu / Quit - [Esc]"""
 
 		self.accept("h", self.toggle_helptext, [True])
@@ -208,6 +218,18 @@ Close menu / Quit - [Esc]"""
 		# init empty MenuInstances
 		self.sim_speed_entry = MenuInstance(None, False)
 		self.cam_speed_entry = MenuInstance(None, False)
+
+		self.tracking_selection = MenuInstance(None, False, self, WindowProperties())
+		self.tracking = False
+		self.trk_min_distance = None
+		self.trk_init_distance = None
+		self.trk_h = 0
+		self.trk_p = 0
+		self.accept("wheel_up", self.distance_update_trk_mode, [False])
+		self.accept("wheel_down", self.distance_update_trk_mode, [True])
+		self.tracking_tooltip = self.genLabelText(5 * '\t' + "Press [Esc] to leave tracking mode\n" +
+												5 * '\t' + "Press [P] to continue", 2)
+		self.tracking_tooltip.hide()
 
 		# ----- TASKS -----		(run every frame)
 		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
@@ -220,6 +242,135 @@ Close menu / Quit - [Esc]"""
 		self.taskMgr.add(self.update_nametags, "NameTagUpdater")
 
 	# ================ END INIT ===================
+
+	def cleanup_tracking(self, leave):
+		self.tracking_tooltip.hide()
+		txt: str = self.tracking_tooltip.text
+		if '\n' not in txt:
+			txt += '\n' + 5 * '\t' + "Press [P] to continue"
+			self.tracking_tooltip.text = txt
+		self.taskMgr.remove("TrackingCameraUpdater")
+		self.taskMgr.add(self.update_camera_hpr, "CameraHprUpdater")
+		self.taskMgr.add(self.update_camera_xyz, "CameraPosUpdater")
+		self.taskMgr.add(self.update_nametags, "NameTagUpdater")
+		self.tracking = not leave
+		self.props.setCursorHidden(True)
+		self.win.requestProperties(self.props)
+
+	def init_tracking(self, cb_name):
+		if self.running:
+			self.toggle_sim_state()
+
+		self.tracking = True
+		print(f"requested {cb_name} tracking")
+		# self.tracking_selection.menu_obj.hide()
+		self.esc_handler()
+
+		txt: str = self.tracking_tooltip.text
+		if '\n' not in txt:
+			txt += '\n' + 5 * '\t' + "Press [P] to continue"
+			self.tracking_tooltip.text = txt
+		self.tracking_tooltip.show()
+
+		cb = None
+
+		for loop_cb in self.celbodies:
+			if loop_cb.name == cb_name:
+				cb = loop_cb
+				break
+
+		self.trk_init_distance = 5
+		self.trk_min_distance = cb.radius
+
+		print(f"radius: {cb.radius}\ninit: {self.trk_init_distance}\nmin: {self.trk_min_distance}\n")
+
+		cb_pos = cb.node.getPos()
+
+		self.camera.setPos(cb_pos[0] + max(self.trk_init_distance, self.trk_min_distance), cb_pos[1], cb_pos[2])
+		self.camera.lookAt(cb.node)
+
+		# self.camera.reparentTo(cb.node)
+
+		self.props.setCursorHidden(True)
+		self.win.requestProperties(self.props)
+
+		self.taskMgr.remove("CameraHprUpdater")
+		self.taskMgr.remove("CameraPosUpdater")
+		self.taskMgr.remove("NameTagUpdater")
+		self.taskMgr.add(self.cam_update_trk_mode, "TrackingCameraUpdater", extraArgs=[Task, cb])
+
+	def distance_update_trk_mode(self, inc):
+		inc = 1 if inc else -1
+		sensitivity = 0.1
+		self.trk_init_distance += sensitivity * inc
+		self.trk_init_distance = max(self.trk_min_distance, self.trk_init_distance)
+
+	def cam_update_trk_mode(self, task, cb: CelBody):
+		txt: str = self.tracking_tooltip.text
+		if self.running and '\n' in txt:
+			self.tracking_tooltip.text = txt.split('\n')[0]
+
+		if not self.mouseWatcherNode.hasMouse():
+			return task.cont
+
+		# Mouse delta from the center
+		mouse_x = self.mouseWatcherNode.getMouseX()
+		mouse_y = self.mouseWatcherNode.getMouseY()
+
+		self.reset_mouse()
+		
+		sensitivity = 1.5
+		d = self.trk_init_distance * cb.radius
+
+		# Apply the mouse deltas to rotate the pivot node
+		delta_x = mouse_x * sensitivity
+		delta_y = mouse_y * sensitivity
+
+		self.trk_h -= delta_x  # Horizontal rotation
+		self.trk_p -= delta_y  # Vertical rotation
+		self.trk_p = max(-math.radians(85), min(math.radians(85), self.trk_p))
+		x = cb.node.getX() + d * -cos(self.trk_h) * cos(self.trk_p)
+		y = cb.node.getY() + d * -sin(self.trk_h) * cos(self.trk_p)
+		z = cb.node.getZ() + d * sin(self.trk_p)
+
+		self.camera.setPos(x, y, z)
+		self.camera.lookAt(cb.node)
+
+		self.update_nametags(Task)
+
+		return task.cont
+
+	def trk_selection(self, task):
+		if self.open_menus:
+			return task.done
+
+		if not self.tracking_selection.menu_obj:
+			self.tracking_selection.menu_obj = DirectOptionMenu(items=[cb.name for cb in self.celbodies],
+																scale=0.075,
+																command=self.init_tracking)
+			trk_sel_label = DirectLabel(parent=self.tracking_selection.menu_obj,
+										text='Select object to track',
+										text_fg=(1, 1, 1, 1),
+										text_bg=(0, 0, 0, 1),
+										text_scale=1,
+										text_pos=(-5.25, 0))
+
+		self.tracking_selection.menu_obj.show()
+		self.tracking_selection.reg_open()
+		self.taskMgr.remove("CameraHprUpdater")
+		self.taskMgr.remove("CameraPosUpdater")
+		self.taskMgr.remove("TrackingCameraUpdater")
+		self.open_menus.append(self.tracking_selection)
+		return task.done
+
+	def pause_then_exec(self, fn, *args):
+		if self.running:
+			self.toggle_sim_state()
+			self.update_vclock(Task)
+			self.update_sim_text(self.running)
+
+		self.taskMgr.doMethodLater(0, fn, None, extraArgs=[Task, *args])
+		# self.taskMgr.step()
 
 	# scale and rotate name tags according to camera position
 	def update_nametags(self, task):
@@ -236,7 +387,7 @@ Close menu / Quit - [Esc]"""
 
 			# make name tag bigger the further away camera is
 			d = math.sqrt((x_cam - x_nt) ** 2 + (y_cam - y_nt) ** 2 + (z_cam - z_nt) ** 2)
-			cb.nametag_np.setScale(0.1 * d)
+			cb.nametag_np.setScale(0.1 * d ** (1/1.1))
 
 		return task.cont
 
@@ -265,7 +416,7 @@ Close menu / Quit - [Esc]"""
 
 	# brings up custom cam speed entry box
 	def enter_cam_speed(self):
-		if self.cam_speed_entry.is_open or self.sim_speed_entry.is_open:
+		if self.open_menus:
 			# abort if it's already open
 			return
 
@@ -300,7 +451,7 @@ Close menu / Quit - [Esc]"""
 
 	# brings up custom simulation speed entry box
 	def enter_sim_speed(self):
-		if self.sim_speed_entry.is_open or self.cam_speed_entry.is_open:
+		if self.open_menus:
 			# abort if it's already open
 			return
 
@@ -509,8 +660,15 @@ Close menu / Quit - [Esc]"""
 	# closes MenuInstance if applicable, otherwise quits app
 	def esc_handler(self):
 		if self.open_menus:
-			self.open_menus[-1].close()
-			self.open_menus.pop()
+			if self.open_menus[-1] == self.tracking_selection:
+				self.open_menus.pop()
+				self.tracking_selection.menu_obj.hide()
+				self.cleanup_tracking(False)
+				return
+			self.open_menus.pop().close()
+		elif self.tracking:
+			self.cleanup_tracking(True)
+			self.open_menus.clear()
 		else:
 			self.userExit()
 
