@@ -27,7 +27,7 @@ class CelBody:
 		self.color = color
 		self.node.setColor(self.color)
 
-		self.trail = MotionTrail(self, self.color, -1)
+		self.trail = MotionTrail(self, self.color, 1000)
 
 		self.nametag = TextNode(self.name)
 		self.nametag.setText(self.name)
@@ -74,6 +74,7 @@ class MotionTrail:
 
 		self.trail_obj = LineSegs()
 		self.trail_obj.setColor(self.trail_color)
+		self.trail_obj_np = NodePath()
 
 	def update_motion_trail(self):
 		if len(self.trail_pts) == self.trail_max_len:  # if max len reached -> remove oldest point
@@ -83,7 +84,7 @@ class MotionTrail:
 		last_pos = self.trail_pts[-1]
 
 		# don't draw line if too close to previous point
-		if vec_mag(vec_sum([pos, vec_neg(last_pos)])) < 10:
+		if vec_mag(vec_sum([pos, vec_neg(last_pos)])) < 1:
 			return
 
 		self.trail_pts.append(pos)  # add current position to motion trail
@@ -92,4 +93,6 @@ class MotionTrail:
 		for p in self.trail_pts[1:]:
 			self.trail_obj.drawTo(p)
 
-		self.parent.base.render.attachNewNode(self.trail_obj.create(True))
+		new_np = self.parent.base.render.attachNewNode(self.trail_obj.create(True))
+		self.trail_obj_np.removeNode()
+		self.trail_obj_np = new_np
