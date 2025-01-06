@@ -1,7 +1,6 @@
 import datetime
 import itertools as it
 import json
-import math
 import platform
 import sys
 from math import pi, sin, cos
@@ -10,7 +9,6 @@ from direct.gui.DirectEntry import DirectEntry
 from direct.gui.DirectLabel import DirectLabel
 from direct.gui.DirectOptionMenu import DirectOptionMenu
 from direct.gui.OnscreenText import OnscreenText
-from direct.interval.IntervalManager import ivalMgr
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from panda3d.core import loadPrcFileData, WindowProperties, TextNode, KeyboardButton, ClockObject, NodePath
@@ -208,7 +206,6 @@ Play/pause simulation - [P]
 Adjust simulation speed - [T]
 
 Follow object - [F]
-Insert new object - [I] (WIP)
 
 Close menu / Quit - [Esc]"""
 
@@ -282,14 +279,10 @@ Close menu / Quit - [Esc]"""
 		self.trk_init_distance = 5
 		self.trk_min_distance = cb.radius
 
-		print(f"radius: {cb.radius}\ninit: {self.trk_init_distance}\nmin: {self.trk_min_distance}\n")
-
 		cb_pos = cb.node.getPos()
 
 		self.camera.setPos(cb_pos[0] + max(self.trk_init_distance, self.trk_min_distance), cb_pos[1], cb_pos[2])
 		self.camera.lookAt(cb.node)
-
-		# self.camera.reparentTo(cb.node)
 
 		self.props.setCursorHidden(True)
 		self.win.requestProperties(self.props)
@@ -322,7 +315,6 @@ Close menu / Quit - [Esc]"""
 		sensitivity = 1.5
 		d = self.trk_init_distance * cb.radius
 
-		# Apply the mouse deltas to rotate the pivot node
 		delta_x = mouse_x * sensitivity
 		delta_y = mouse_y * sensitivity
 
@@ -661,7 +653,7 @@ Close menu / Quit - [Esc]"""
 	def esc_handler(self):
 		if self.open_menus:
 			if self.open_menus[-1] == self.tracking_selection:
-				self.open_menus.pop()
+				self.open_menus.clear()
 				self.tracking_selection.menu_obj.hide()
 				self.cleanup_tracking(False)
 				return
